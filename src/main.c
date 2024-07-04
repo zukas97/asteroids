@@ -4,8 +4,9 @@
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include "defs.h"
-//#include "sprites.h"
 
+
+//Globals
 SDL_Window *win = NULL;
 SDL_Renderer *rend = NULL;
 
@@ -17,6 +18,7 @@ SDL_Surface *rocket_surface;
 SDL_Texture *rocket_texture;
 
 
+//Sprites
 struct Rocket {
 	int x;
 	int y;
@@ -28,9 +30,7 @@ struct Rocket {
 
 } rocket;
 
-int w,h;
 
-//extern Rocket;
 
 int Init_Win(void) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
