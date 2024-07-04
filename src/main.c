@@ -79,10 +79,15 @@ void input() {
 						break;
 					
 					case SDLK_LEFT:
-						rocket.x -= 4;
+						if (rocket.x >= 10){
+							rocket.x -= 4;
+						}
 						break;
 					case SDLK_RIGHT:
-						rocket.x += 4;
+						if (rocket.x <= WIN_WIDTH - 55){
+							rocket.x += 4;
+						}
+						break;
 						
 
 
