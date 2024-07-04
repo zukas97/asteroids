@@ -22,6 +22,9 @@ struct Rocket {
 	int y;
 	int width;
 	int height;
+	int vel;
+	bool left;
+	bool right;
 
 } rocket;
 
@@ -63,6 +66,7 @@ int Init_Win(void) {
 
 void input() {
 	SDL_Event event;
+	int is_pressed = event.key.state == SDL_PRESSED;
 	if (SDL_WaitEvent(&event)){
 		switch (event.type) {
 			case SDL_QUIT:
@@ -73,6 +77,15 @@ void input() {
 					case SDLK_ESCAPE:
 						running = false;
 						break;
+					
+					case SDLK_LEFT:
+						rocket.x -= 4;
+						break;
+					case SDLK_RIGHT:
+						rocket.x += 4;
+						
+
+
 				break;
 				}
 		}
@@ -86,7 +99,17 @@ void update() {
 		SDL_Delay(wait_time);
 	}
 
-	//last_frame_time = SDL_GetTicks();
+	float dtime = (SDL_GetTicks() - last_frame_time) / 1000.0f;
+
+	last_frame_time = SDL_GetTicks();
+
+	if (rocket.left) {
+		rocket.x  = 20 * dtime;
+	}
+	else if (rocket.right) {
+		rocket.x = -20 * dtime;
+	}
+
 }
 
 void render() {
@@ -107,7 +130,6 @@ void render() {
 		rocket.height,
 	};
 
-	SDL_QueryTexture(rocket_texture, NULL, NULL, &w, &h);
 	SDL_RenderCopy(rend, rocket_texture, NULL, &Rocket);
 	SDL_RenderPresent(rend); 
 
@@ -125,6 +147,7 @@ void setup() {
 	rocket.y = 620;
 	rocket.width = 46;
 	rocket.height = 82;
+	rocket.vel = 0;
 }
 
 int main() {
