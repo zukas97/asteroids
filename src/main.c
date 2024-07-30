@@ -123,7 +123,7 @@ void render() {
 	SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
 	SDL_RenderClear(rend);
 	
-	rocket_surface = IMG_Load("/home/zukas/C/sdl/asteroids//images/rocket.bmp");
+	rocket_surface = IMG_Load("./images/rocket.bmp");
 	rocket_texture = SDL_CreateTextureFromSurface(rend, rocket_surface);
 	SDL_FreeSurface(rocket_surface);
 	
