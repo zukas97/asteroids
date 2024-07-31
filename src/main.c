@@ -14,6 +14,7 @@ SDL_Renderer *rend = NULL;
 
 int running = false;
 int last_frame_time;
+float dtime;
 
 
 SDL_Surface *rocket_surface;
@@ -90,13 +91,13 @@ void input() {
 						break;
 					
 					case SDLK_LEFT:
-						if (rocket.x >= 10){
-							rocket.x -= 5;
+						if (rocket.x >= 10) {
+							rocket.x -= 500 * dtime;
 						}
 						break;
 					case SDLK_RIGHT:
-						if (rocket.x <= WIN_WIDTH - 55){
-							rocket.x += 5;
+						if (rocket.x <= WIN_WIDTH - 55) {
+							rocket.x += 500 * dtime;
 						}
 						break;
 						
@@ -123,11 +124,11 @@ void update() {
 		SDL_Delay(wait_time);
 	}
 
-	float dtime = (SDL_GetTicks() - last_frame_time) / 1000.0f;
+	dtime = (SDL_GetTicks() - last_frame_time) / 1000.0f;
 
 	last_frame_time = SDL_GetTicks();
 
-	asteroid.y += 5;
+	asteroid.y += 100 * dtime;
 
 	if (asteroid.y >= WIN_HEIGHT) {
 		summon_asteroid();
