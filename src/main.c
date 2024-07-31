@@ -1,4 +1,4 @@
-//#include <stdlib.h>
+//#include <stdlib.h
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
@@ -91,12 +91,12 @@ void input() {
 					
 					case SDLK_LEFT:
 						if (rocket.x >= 10){
-							rocket.x -= 4;
+							rocket.x -= 5;
 						}
 						break;
 					case SDLK_RIGHT:
 						if (rocket.x <= WIN_WIDTH - 55){
-							rocket.x += 4;
+							rocket.x += 5;
 						}
 						break;
 						
