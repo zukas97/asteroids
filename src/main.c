@@ -19,6 +19,7 @@ int last_frame_time;
 float dtime;
 bool gameover;
 
+int bullet_count;
 
 SDL_Surface *rocket_surface;
 SDL_Texture *rocket_texture;
@@ -56,6 +57,13 @@ struct Background {
 	
 } gameover_screen;
 
+struct Bullet {
+	int x;
+	int y;
+	int width;
+	int height;
+} bullet;
+
 
 
 int Init_Win(void) {
@@ -73,7 +81,7 @@ int Init_Win(void) {
 		0
 			);
 
-	
+
 	if (!win) {
 		fprintf(stderr, "Error initalizing window\n");
 		return false;
@@ -119,7 +127,12 @@ void input() {
 						if (rocket.x <= WIN_WIDTH - 55) {
 							rocket.x += 500 * dtime;
 						}
+					
 						break;
+					case SDLK_SPACE:
+						bullet.x = rocket.x + (rocket.width/2);
+						bullet.y = rocket.y;
+
 						
 
 
@@ -160,9 +173,19 @@ void render() {
 		asteroid.height,
 	};
 
+	SDL_Rect Bullet = {
+		bullet.x,
+		bullet.y,
+		bullet.width,
+		bullet.height,
+	};
 
 	if (gameover == false) {
 	
+		if (SDL_HasIntersection(&Rocket, &Asteroid)) {
+			gameover = true;
+		}
+
 		SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
 		SDL_RenderClear(rend);
 		
@@ -174,12 +197,17 @@ void render() {
 		asteroid_texture = SDL_CreateTextureFromSurface(rend, asteroid_surface);
 		SDL_FreeSurface(asteroid_surface);
 		
+		SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
 		
-			
-		if (SDL_HasIntersection(&Rocket, &Asteroid)) {
-			gameover = true;
-		}
-
+		SDL_RenderFillRect(rend, &Bullet);
+		/*if (bullet_count >= 1) {
+			SDL_RenderFillRect(rend, &Bullet);
+			if (bullet.y <= -10) {
+				bullet_count -= 1;
+			}
+		}*/
+		
+		
 		
 		SDL_RenderCopy(rend, rocket_texture, NULL, &Rocket);
 		SDL_RenderCopy(rend, asteroid_texture, NULL, &Asteroid);
@@ -190,30 +218,11 @@ void render() {
 		SDL_DestroyTexture(rocket_texture);
 	}
 	else if (gameover == true) {
-		/*SDL_RenderClear(rend);
-		SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
-		SDL_RenderClear(rend);
-		TTF_Font *font = TTF_OpenFont("PixelGamingRegular-d9w0g.ttf", 25);
-		SDL_Surface * textsurface = TTF_RenderText_Solid(font, "GAME OVER", white);
-		SDL_Texture * texttexture = SDL_CreateTextureFromSurface(rend, textsurface);
-		SDL_Rect text = {100, 100, textsurface->w, textsurface->h};
-		SDL_FreeSurface(textsurface);
-		SDL_RenderCopy(rend, texttexture, NULL, &text);
-		SDL_RenderPresent(rend);
-		SDL_DestroyTexture(texttexture);*/
-
 		SDL_Surface * background_surface = IMG_Load("./images/gameover.png");
 		SDL_Texture* background_texture = SDL_CreateTextureFromSurface(rend, background_surface);
 		SDL_FreeSurface(background_surface);
 		SDL_RenderCopy(rend, background_texture, NULL, &Background);
 		SDL_RenderPresent(rend);
-
-
-
-
-		
-
-		
 
 
 	}
@@ -237,6 +246,9 @@ void update() {
 		summon_asteroid();
 	}
 
+	//bullet.x = rocket.x;
+	bullet.y -= 5;
+
 
 }
 
@@ -258,10 +270,13 @@ void setup() {
 	asteroid.y = 100;
 	asteroid.width = 50;
 	asteroid.height = 50;
-	gameover_screen.x = 1;
-	gameover_screen.y = 1;
+	gameover_screen.x = 0;
+	gameover_screen.y = 0;
 	gameover_screen.width = WIN_WIDTH;
 	gameover_screen.height = WIN_HEIGHT;
+	bullet.width = 5;
+	bullet.height = 10;
+	bullet.y = 900;
 }
 
 int main() {
