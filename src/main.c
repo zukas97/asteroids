@@ -1,8 +1,10 @@
 //#include <stdlib.h
+#include <SDL2/SDL_render.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include <time.h>
 #include "defs.h"
@@ -15,6 +17,7 @@ SDL_Renderer *rend = NULL;
 int running = false;
 int last_frame_time;
 float dtime;
+bool gameover;
 
 
 SDL_Surface *rocket_surface;
@@ -22,6 +25,9 @@ SDL_Texture *rocket_texture;
 
 SDL_Surface *asteroid_surface;
 SDL_Texture *asteroid_texture;
+
+SDL_Color white = {255, 255, 255};
+
 
 //Sprites
 struct Rocket {
@@ -41,6 +47,14 @@ struct Asteroid {
 	int width;
 	int height;
 } asteroid;
+
+struct Background {
+	int x;
+	int y;
+	int width;
+	int height;
+	
+} gameover_screen;
 
 
 
@@ -71,6 +85,12 @@ int Init_Win(void) {
 		fprintf(stderr, "Error initalizing renderer\n");
 		return false;
 	}
+
+	if (!IMG_Init(IMG_INIT_PNG)) {
+		fprintf(stderr, "Error initalizing SDL_image\n");
+		return false;
+	}
+
 
 	return true;
 
@@ -117,6 +137,89 @@ void summon_asteroid() {
 	asteroid.y = -50;
 }
 
+
+void render() {
+	SDL_Rect Rocket = {
+		rocket.x,
+		rocket.y,
+		rocket.width,
+		rocket.height,
+	};
+
+	SDL_Rect Background = {
+		gameover_screen.x,
+		gameover_screen.y,
+		gameover_screen.width,
+		gameover_screen.height,
+	};
+
+	SDL_Rect Asteroid = {
+		asteroid.x,
+		asteroid.y,
+		asteroid.width,
+		asteroid.height,
+	};
+
+
+	if (gameover == false) {
+	
+		SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+		SDL_RenderClear(rend);
+		
+		rocket_surface = IMG_Load("./images/rocket.bmp");
+		rocket_texture = SDL_CreateTextureFromSurface(rend, rocket_surface);
+		SDL_FreeSurface(rocket_surface);
+
+		asteroid_surface = IMG_Load("./images/asteroid.bmp");
+		asteroid_texture = SDL_CreateTextureFromSurface(rend, asteroid_surface);
+		SDL_FreeSurface(asteroid_surface);
+		
+		
+			
+		if (SDL_HasIntersection(&Rocket, &Asteroid)) {
+			gameover = true;
+		}
+
+		
+		SDL_RenderCopy(rend, rocket_texture, NULL, &Rocket);
+		SDL_RenderCopy(rend, asteroid_texture, NULL, &Asteroid);
+		
+		SDL_RenderPresent(rend); 
+		SDL_RenderClear(rend);
+		SDL_DestroyTexture(asteroid_texture);
+		SDL_DestroyTexture(rocket_texture);
+	}
+	else if (gameover == true) {
+		/*SDL_RenderClear(rend);
+		SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+		SDL_RenderClear(rend);
+		TTF_Font *font = TTF_OpenFont("PixelGamingRegular-d9w0g.ttf", 25);
+		SDL_Surface * textsurface = TTF_RenderText_Solid(font, "GAME OVER", white);
+		SDL_Texture * texttexture = SDL_CreateTextureFromSurface(rend, textsurface);
+		SDL_Rect text = {100, 100, textsurface->w, textsurface->h};
+		SDL_FreeSurface(textsurface);
+		SDL_RenderCopy(rend, texttexture, NULL, &text);
+		SDL_RenderPresent(rend);
+		SDL_DestroyTexture(texttexture);*/
+
+		SDL_Surface * background_surface = IMG_Load("./images/gameover.png");
+		SDL_Texture* background_texture = SDL_CreateTextureFromSurface(rend, background_surface);
+		SDL_FreeSurface(background_surface);
+		SDL_RenderCopy(rend, background_texture, NULL, &Background);
+		SDL_RenderPresent(rend);
+
+
+
+
+		
+
+		
+
+
+	}
+
+}
+
 void update() {
 	int wait_time = FRAME_TIME - (SDL_GetTicks() - last_frame_time);
 
@@ -134,46 +237,6 @@ void update() {
 		summon_asteroid();
 	}
 
-}
-
-void render() {
-
-
-	
-	SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
-	SDL_RenderClear(rend);
-	
-	rocket_surface = IMG_Load("./images/rocket.bmp");
-	rocket_texture = SDL_CreateTextureFromSurface(rend, rocket_surface);
-	SDL_FreeSurface(rocket_surface);
-
-	asteroid_surface = IMG_Load("./images/asteroid.bmp");
-	asteroid_texture = SDL_CreateTextureFromSurface(rend, asteroid_surface);
-	SDL_FreeSurface(asteroid_surface);
-	
-	
-	SDL_Rect Rocket = {
-		rocket.x,
-		rocket.y,
-		rocket.width,
-		rocket.height,
-	};
-
-	SDL_Rect Asteroid = {
-		asteroid.x,
-		asteroid.y,
-		asteroid.width,
-		asteroid.height,
-	};
-
-	
-	SDL_RenderCopy(rend, rocket_texture, NULL, &Rocket);
-	SDL_RenderCopy(rend, asteroid_texture, NULL, &Asteroid);
-	
-	SDL_RenderPresent(rend); 
-	SDL_RenderClear(rend);
-	SDL_DestroyTexture(asteroid_texture);
-	SDL_DestroyTexture(rocket_texture);
 
 }
 
@@ -195,6 +258,10 @@ void setup() {
 	asteroid.y = 100;
 	asteroid.width = 50;
 	asteroid.height = 50;
+	gameover_screen.x = 1;
+	gameover_screen.y = 1;
+	gameover_screen.width = WIN_WIDTH;
+	gameover_screen.height = WIN_HEIGHT;
 }
 
 int main() {
