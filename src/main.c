@@ -269,11 +269,11 @@ void update() {
 		}
 		else if (score >= 5 && score < 10) {
 			asteroid.vel = 200;
-			rocket.vel = 910;
+			rocket.vel = 915;
 		}
 		else if (score >= 10 && score < 15) {
 			asteroid.vel = 250;
-			rocket.vel = 920;
+			rocket.vel = 925;
 		}
 		
 	}
@@ -314,10 +314,7 @@ void setup() {
 	asteroid.vel = 100;
 	rocket.vel = 900;
 
-
-	//pthread_create(&input_thread, NULL, &input, NULL);
 }
-
 int main() {
 	running = Init_Win();
 	
