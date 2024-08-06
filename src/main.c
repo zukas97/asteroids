@@ -62,6 +62,10 @@ struct Bullet {
 	int height;
 } bullet;
 
+SDL_Rect Rocket;
+SDL_Rect Asteroid;
+SDL_Rect Background;
+SDL_Rect Bullet;
 
 
 int Init_Win(void) {
@@ -214,6 +218,12 @@ void render() {
 		SDL_RenderClear(rend);
 		SDL_DestroyTexture(asteroid_texture);
 		SDL_DestroyTexture(rocket_texture);
+		
+		if (SDL_HasIntersection(&Bullet, &Asteroid)) {
+			asteroid.y = -50;
+			bullet.y = -10;
+			summon_asteroid();
+		}
 	}
 	else if (gameover == true) {
 		SDL_Surface * background_surface = IMG_Load("./images/gameover.png");
@@ -248,6 +258,7 @@ void update() {
 	bullet.y -= 5;
 
 
+
 }
 
 void destroy() {
@@ -274,7 +285,7 @@ void setup() {
 	gameover_screen.height = WIN_HEIGHT;
 	bullet.width = 5;
 	bullet.height = 10;
-	bullet.y = 900;
+	bullet.y = -10;
 }
 
 int main() {
