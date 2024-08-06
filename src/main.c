@@ -7,7 +7,6 @@
 #include <stdbool.h>
 #include <time.h>
 #include "defs.h"
-#include <pthread.h>
 
 
 //Globals
@@ -109,11 +108,10 @@ int Init_Win(void) {
 }
 
 
-void* input() {
-	while (running) {
+void input() {
 		SDL_Event event;
 		//int is_pressed = event.key.state == SDL_PRESSED;
-		if (SDL_WaitEvent(&event)){
+		if (SDL_PollEvent(&event)){
 			switch (event.type) {
 				case SDL_QUIT:
 					running = false;
@@ -151,9 +149,6 @@ void* input() {
 					}
 			}
 		}
-	}
-	pthread_exit(NULL);
-	return 0;
 }
 
 void summon_asteroid() {
@@ -292,7 +287,7 @@ void update() {
 }
 
 void destroy() {
-	//pthread_join(input_thread, NULL);
+	pthread_join(input_thread, NULL);
 	SDL_DestroyTexture(asteroid_texture);
 	SDL_DestroyTexture(rocket_texture);
 	SDL_DestroyRenderer(rend);
@@ -321,7 +316,7 @@ void setup() {
 	rocket.vel = 900;
 
 
-	pthread_create(&input_thread, NULL, &input, NULL);
+	//pthread_create(&input_thread, NULL, &input, NULL);
 }
 
 int main() {
@@ -330,11 +325,10 @@ int main() {
 	setup();
 
 	while (running) {
-	//	input();
+		input();
 		update();
 		render();
 	}
 	destroy();
 	return 0;
 }
-
