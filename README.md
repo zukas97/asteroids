@@ -3,7 +3,7 @@
 
 A simple asteroid shooting game made in C with SDL.
 
-__THIS IS NOT FINISHED YET IT IS OPEN TO CONTRIBUTERS__
+this is still a WIP but can now can be considered a "game" (sort-of)
 
 # Building 
 
