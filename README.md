@@ -17,3 +17,9 @@ I didn't say a spicific package name bc it is different for each distro
 to build run `make`
 
 you can also run `make run` to compile it, run it, and then remove it.
+
+# dependancies for the binairy release
+
+`SDL2`
+
+`SDL2_image`
