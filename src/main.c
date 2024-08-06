@@ -231,11 +231,14 @@ void render() {
 		}
 	}
 	else if (gameover == true) {
+		//pthread_join(input_thread, NULL);
+		SDL_RenderClear(rend);
 		SDL_Surface * background_surface = IMG_Load("./images/gameover.png");
 		SDL_Texture* background_texture = SDL_CreateTextureFromSurface(rend, background_surface);
 		SDL_FreeSurface(background_surface);
 		SDL_RenderCopy(rend, background_texture, NULL, &Background);
 		SDL_RenderPresent(rend);
+		SDL_DestroyTexture(background_texture);
 
 
 	}
@@ -256,7 +259,7 @@ void update() {
 	asteroid.y += 100 * dtime;
 
 	if (asteroid.y >= WIN_HEIGHT) {
-		summon_asteroid();
+		gameover = true;
 	}
 
 	//bullet.x = rocket.x;
