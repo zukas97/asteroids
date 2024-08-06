@@ -18,7 +18,7 @@ int last_frame_time;
 float dtime;
 bool gameover;
 
-int bullet_count;
+int score;
 
 SDL_Surface *rocket_surface;
 SDL_Texture *rocket_texture;
@@ -47,6 +47,7 @@ struct Asteroid {
 	int y;
 	int width;
 	int height;
+	int vel;
 } asteroid;
 
 struct Background {
@@ -130,7 +131,7 @@ void* input() {
 							break;
 						case SDLK_RIGHT:
 							if (rocket.x <= WIN_WIDTH - 55) {
-								rocket.x += 500 * dtime;
+								rocket.x += 900 * dtime;
 							}
 						
 							break;
@@ -229,6 +230,7 @@ void render() {
 			asteroid.y = -50;
 			bullet.y = -10;
 			summon_asteroid();
+			score += 1;
 		}
 	}
 	else if (gameover == true) {
@@ -257,14 +259,18 @@ void update() {
 
 	last_frame_time = SDL_GetTicks();
 
-	asteroid.y += 100 * dtime;
+	asteroid.y += asteroid.vel * dtime;
 
 	if (asteroid.y >= WIN_HEIGHT) {
 		gameover = true;
 	}
 
 	//bullet.x = rocket.x;
-	bullet.y -= 5;
+	bullet.y -= 500 * dtime;
+
+	if (score == 5) {
+		asteroid.vel += 5;
+	}
 
 
 
@@ -296,6 +302,7 @@ void setup() {
 	bullet.width = 5;
 	bullet.height = 10;
 	bullet.y = -10;
+	asteroid.vel = 100;
 
 	pthread_create(&input_thread, NULL, &input, NULL);
 }
