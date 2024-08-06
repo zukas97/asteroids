@@ -287,7 +287,6 @@ void update() {
 }
 
 void destroy() {
-	pthread_join(input_thread, NULL);
 	SDL_DestroyTexture(asteroid_texture);
 	SDL_DestroyTexture(rocket_texture);
 	SDL_DestroyRenderer(rend);
