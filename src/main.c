@@ -37,9 +37,6 @@ struct Rocket {
 	int width;
 	int height;
 	int vel;
-	bool left;
-	bool right;
-
 } rocket;
 
 struct Asteroid {
@@ -65,10 +62,6 @@ struct Bullet {
 	int height;
 } bullet;
 
-SDL_Rect Rocket;
-SDL_Rect Asteroid;
-SDL_Rect Background;
-SDL_Rect Bullet;
 
 
 int Init_Win(void) {
@@ -131,7 +124,7 @@ void* input() {
 							break;
 						case SDLK_RIGHT:
 							if (rocket.x <= WIN_WIDTH - 55) {
-								rocket.x += 900 * dtime;
+								rocket.x += rocket.vel * dtime;
 							}
 						
 							break;
@@ -268,9 +261,18 @@ void update() {
 	//bullet.x = rocket.x;
 	bullet.y -= 500 * dtime;
 
-	if (score == 5) {
-		asteroid.vel += 5;
+	if (score < 5) {
+		asteroid.vel = 100;
 	}
+	else if (score >= 5 && score < 10) {
+		asteroid.vel = 200;
+		rocket.vel = 910;
+	}
+	else if (score >= 10 && score < 15) {
+		asteroid.vel = 250;
+		rocket.vel = 920;
+	}
+
 
 
 
@@ -303,6 +305,7 @@ void setup() {
 	bullet.height = 10;
 	bullet.y = -10;
 	asteroid.vel = 100;
+	rocket.vel = 900;
 
 	pthread_create(&input_thread, NULL, &input, NULL);
 }
