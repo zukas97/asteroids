@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include "defs.h"
+#include <pthread.h>
 
 
 //Globals
@@ -27,6 +28,7 @@ SDL_Texture *asteroid_texture;
 
 SDL_Color white = {255, 255, 255};
 
+pthread_t input_thread;
 
 //Sprites
 struct Rocket {
@@ -106,42 +108,45 @@ int Init_Win(void) {
 
 }
 
-void input() {
-	SDL_Event event;
-	//int is_pressed = event.key.state == SDL_PRESSED;
-	if (SDL_PollEvent(&event)){
-		switch (event.type) {
-			case SDL_QUIT:
-				running = false;
-				break;
-			case SDL_KEYDOWN:
-				switch (event.key.keysym.sym) {
-					case SDLK_ESCAPE:
-						running = false;
-						break;
-					
-					case SDLK_LEFT:
-						if (rocket.x >= 10) {
-							rocket.x -= 500 * dtime;
-						}
-						break;
-					case SDLK_RIGHT:
-						if (rocket.x <= WIN_WIDTH - 55) {
-							rocket.x += 500 * dtime;
-						}
-					
-						break;
-					case SDLK_SPACE:
-						bullet.x = rocket.x + (rocket.width/2);
-						bullet.y = rocket.y;
-
+void* input() {
+	while (running) {
+		SDL_Event event;
+		//int is_pressed = event.key.state == SDL_PRESSED;
+		if (SDL_WaitEvent(&event)){
+			switch (event.type) {
+				case SDL_QUIT:
+					running = false;
+					break;
+				case SDL_KEYDOWN:
+					switch (event.key.keysym.sym) {
+						case SDLK_ESCAPE:
+							running = false;
+							break;
 						
+						case SDLK_LEFT:
+							if (rocket.x >= 10) {
+								rocket.x -= 500 * dtime;
+							}
+							break;
+						case SDLK_RIGHT:
+							if (rocket.x <= WIN_WIDTH - 55) {
+								rocket.x += 500 * dtime;
+							}
+						
+							break;
+						case SDLK_SPACE:
+							bullet.x = rocket.x + (rocket.width/2);
+							bullet.y = rocket.y;
+
+							
 
 
-				break;
-				}
+					break;
+					}
+			}
 		}
 	}
+	return 0;
 }
 
 void summon_asteroid() {
@@ -262,6 +267,7 @@ void update() {
 }
 
 void destroy() {
+	pthread_join(input_thread, NULL);
 	SDL_DestroyTexture(asteroid_texture);
 	SDL_DestroyTexture(rocket_texture);
 	SDL_DestroyRenderer(rend);
@@ -286,6 +292,8 @@ void setup() {
 	bullet.width = 5;
 	bullet.height = 10;
 	bullet.y = -10;
+
+	pthread_create(&input_thread, NULL, &input, NULL);
 }
 
 int main() {
@@ -294,7 +302,7 @@ int main() {
 	setup();
 
 	while (running) {
-		input();
+	//	input();
 		update();
 		render();
 	}
