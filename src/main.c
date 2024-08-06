@@ -1,3 +1,4 @@
+#include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,9 +27,14 @@ SDL_Texture *rocket_texture;
 SDL_Surface *asteroid_surface;
 SDL_Texture *asteroid_texture;
 
+SDL_Surface *start_surface;
+SDL_Texture *start_texture;
+
 SDL_Color white = {255, 255, 255};
 
 pthread_t input_thread;
+
+void setup();
 
 //Sprites
 struct Rocket {
@@ -102,6 +108,7 @@ int Init_Win(void) {
 
 }
 
+
 void* input() {
 	while (running) {
 		SDL_Event event;
@@ -131,6 +138,11 @@ void* input() {
 						case SDLK_SPACE:
 							bullet.x = rocket.x + (rocket.width/2);
 							bullet.y = rocket.y;
+							break;
+						case SDLK_RETURN:
+							if (gameover == true) {
+								gameover = false;
+							}
 
 							
 
@@ -182,6 +194,8 @@ void render() {
 		bullet.height,
 	};
 
+
+
 	if (gameover == false) {
 	
 		if (SDL_HasIntersection(&Rocket, &Asteroid)) {
@@ -202,13 +216,6 @@ void render() {
 		SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
 		
 		SDL_RenderFillRect(rend, &Bullet);
-		/*if (bullet_count >= 1) {
-			SDL_RenderFillRect(rend, &Bullet);
-			if (bullet.y <= -10) {
-				bullet_count -= 1;
-			}
-		}*/
-		
 		
 		
 		SDL_RenderCopy(rend, rocket_texture, NULL, &Rocket);
@@ -228,6 +235,7 @@ void render() {
 	}
 	else if (gameover == true) {
 		//pthread_join(input_thread, NULL);
+		
 		SDL_RenderClear(rend);
 		SDL_Surface * background_surface = IMG_Load("./images/gameover.png");
 		SDL_Texture* background_texture = SDL_CreateTextureFromSurface(rend, background_surface);
@@ -238,7 +246,7 @@ void render() {
 
 
 	}
-
+	
 }
 
 void update() {
@@ -251,31 +259,36 @@ void update() {
 	dtime = (SDL_GetTicks() - last_frame_time) / 1000.0f;
 
 	last_frame_time = SDL_GetTicks();
+	if (gameover == false) {
+		asteroid.y += asteroid.vel * dtime;
 
-	asteroid.y += asteroid.vel * dtime;
+		if (asteroid.y >= WIN_HEIGHT) {
+			gameover = true;
+		}
 
-	if (asteroid.y >= WIN_HEIGHT) {
-		gameover = true;
+		//bullet.x = rocket.x;
+		bullet.y -= 500 * dtime;
+
+		if (score < 5) {
+			asteroid.vel = 100;
+		}
+		else if (score >= 5 && score < 10) {
+			asteroid.vel = 200;
+			rocket.vel = 910;
+		}
+		else if (score >= 10 && score < 15) {
+			asteroid.vel = 250;
+			rocket.vel = 920;
+		}
+		
 	}
 
-	//bullet.x = rocket.x;
-	bullet.y -= 500 * dtime;
+	if (gameover == true) {
+		setup();
 
-	if (score < 5) {
-		asteroid.vel = 100;
-	}
-	else if (score >= 5 && score < 10) {
-		asteroid.vel = 200;
-		rocket.vel = 910;
-	}
-	else if (score >= 10 && score < 15) {
-		asteroid.vel = 250;
-		rocket.vel = 920;
 	}
 
-
-
-
+	
 }
 
 void destroy() {
@@ -306,6 +319,7 @@ void setup() {
 	bullet.y = -10;
 	asteroid.vel = 100;
 	rocket.vel = 900;
+
 
 	pthread_create(&input_thread, NULL, &input, NULL);
 }
