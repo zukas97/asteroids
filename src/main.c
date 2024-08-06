@@ -146,6 +146,7 @@ void* input() {
 			}
 		}
 	}
+	pthread_exit(NULL);
 	return 0;
 }
 
@@ -270,7 +271,7 @@ void update() {
 }
 
 void destroy() {
-	pthread_join(input_thread, NULL);
+	//pthread_join(input_thread, NULL);
 	SDL_DestroyTexture(asteroid_texture);
 	SDL_DestroyTexture(rocket_texture);
 	SDL_DestroyRenderer(rend);
