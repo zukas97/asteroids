@@ -90,7 +90,7 @@ int Init_Win(void) {
 		return false;
 	}
 
-	rend = SDL_CreateRenderer(win, -1, 0);
+	rend = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 
 	if (!rend) {
 		fprintf(stderr, "Error initalizing renderer\n");
