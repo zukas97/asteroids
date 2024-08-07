@@ -300,8 +300,8 @@ void setup() {
 	rocket.width = 46;
 	rocket.height = 82;
 	rocket.vel = 0;
-	asteroid.x = 100;
-	asteroid.y = 100;
+	//asteroid.x = 100;
+	//asteroid.y = -100;
 	asteroid.width = 50;
 	asteroid.height = 50;
 	gameover_screen.x = 0;
@@ -313,6 +313,8 @@ void setup() {
 	bullet.y = -10;
 	asteroid.vel = 100;
 	rocket.vel = 900;
+	score = 0;
+	summon_asteroid();
 
 }
 int main() {
