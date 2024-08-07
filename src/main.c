@@ -17,6 +17,7 @@ int running = false;
 int last_frame_time;
 float dtime;
 bool gameover;
+bool started = false;
 
 int score;
 
@@ -58,7 +59,7 @@ struct Background {
 	int width;
 	int height;
 	
-} gameover_screen;
+} background;
 
 struct Bullet {
 	int x;
@@ -138,9 +139,13 @@ void input() {
 							bullet.y = rocket.y;
 							break;
 						case SDLK_RETURN:
-							if (gameover == true) {
+							if (!started) {
+								started = true;
+							}
+							else if (gameover == true) {
 								gameover = false;
 							}
+							break;
 
 							
 
@@ -169,10 +174,10 @@ void render() {
 	};
 
 	SDL_Rect Background = {
-		gameover_screen.x,
-		gameover_screen.y,
-		gameover_screen.width,
-		gameover_screen.height,
+		background.x,
+		background.y,
+		background.width,
+		background.height,
 	};
 
 	SDL_Rect Asteroid = {
@@ -190,58 +195,67 @@ void render() {
 	};
 
 
+	if (started == true) {
+		if (gameover == false) {
+		
+			if (SDL_HasIntersection(&Rocket, &Asteroid)) {
+				gameover = true;
+			}
 
-	if (gameover == false) {
-	
-		if (SDL_HasIntersection(&Rocket, &Asteroid)) {
-			gameover = true;
+			SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+			SDL_RenderClear(rend);
+			
+			rocket_surface = IMG_Load("./images/rocket.bmp");
+			rocket_texture = SDL_CreateTextureFromSurface(rend, rocket_surface);
+			SDL_FreeSurface(rocket_surface);
+
+			asteroid_surface = IMG_Load("./images/asteroid.bmp");
+			asteroid_texture = SDL_CreateTextureFromSurface(rend, asteroid_surface);
+			SDL_FreeSurface(asteroid_surface);
+			
+			SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
+			
+			SDL_RenderFillRect(rend, &Bullet);
+			
+			
+			SDL_RenderCopy(rend, rocket_texture, NULL, &Rocket);
+			SDL_RenderCopy(rend, asteroid_texture, NULL, &Asteroid);
+			
+			SDL_RenderPresent(rend); 
+			SDL_RenderClear(rend);
+			SDL_DestroyTexture(asteroid_texture);
+			SDL_DestroyTexture(rocket_texture);
+			
+			if (SDL_HasIntersection(&Bullet, &Asteroid)) {
+				asteroid.y = -50;
+				bullet.y = -10;
+				summon_asteroid();
+				score += 1;
+			}
 		}
+		else if (gameover == true) {
+			//pthread_join(input_thread, NULL);
+			
+			SDL_RenderClear(rend);
+			SDL_Surface * background_surface = IMG_Load("./images/gameover.png");
+			SDL_Texture* background_texture = SDL_CreateTextureFromSurface(rend, background_surface);
+			SDL_FreeSurface(background_surface);
+			SDL_RenderCopy(rend, background_texture, NULL, &Background);
+			SDL_RenderPresent(rend);
+			SDL_DestroyTexture(background_texture);
 
-		SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
-		SDL_RenderClear(rend);
-		
-		rocket_surface = IMG_Load("./images/rocket.bmp");
-		rocket_texture = SDL_CreateTextureFromSurface(rend, rocket_surface);
-		SDL_FreeSurface(rocket_surface);
 
-		asteroid_surface = IMG_Load("./images/asteroid.bmp");
-		asteroid_texture = SDL_CreateTextureFromSurface(rend, asteroid_surface);
-		SDL_FreeSurface(asteroid_surface);
-		
-		SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
-		
-		SDL_RenderFillRect(rend, &Bullet);
-		
-		
-		SDL_RenderCopy(rend, rocket_texture, NULL, &Rocket);
-		SDL_RenderCopy(rend, asteroid_texture, NULL, &Asteroid);
-		
-		SDL_RenderPresent(rend); 
-		SDL_RenderClear(rend);
-		SDL_DestroyTexture(asteroid_texture);
-		SDL_DestroyTexture(rocket_texture);
-		
-		if (SDL_HasIntersection(&Bullet, &Asteroid)) {
-			asteroid.y = -50;
-			bullet.y = -10;
-			summon_asteroid();
-			score += 1;
 		}
 	}
-	else if (gameover == true) {
-		//pthread_join(input_thread, NULL);
-		
-		SDL_RenderClear(rend);
-		SDL_Surface * background_surface = IMG_Load("./images/gameover.png");
+	else if (started == false) {
+		SDL_Surface * background_surface = IMG_Load("./images/home.png");
 		SDL_Texture* background_texture = SDL_CreateTextureFromSurface(rend, background_surface);
 		SDL_FreeSurface(background_surface);
 		SDL_RenderCopy(rend, background_texture, NULL, &Background);
 		SDL_RenderPresent(rend);
 		SDL_DestroyTexture(background_texture);
-
-
+		
 	}
-	
 }
 
 void update() {
@@ -254,7 +268,8 @@ void update() {
 	dtime = (SDL_GetTicks() - last_frame_time) / 1000.0f;
 
 	last_frame_time = SDL_GetTicks();
-	if (gameover == false) {
+	if (started == true) {
+		if (gameover == false) {
 		asteroid.y += asteroid.vel * dtime;
 
 		if (asteroid.y >= WIN_HEIGHT) {
@@ -291,6 +306,8 @@ void update() {
 
 	}
 
+	}
+
 	
 }
 
@@ -312,10 +329,10 @@ void setup() {
 	//asteroid.y = -100;
 	asteroid.width = 50;
 	asteroid.height = 50;
-	gameover_screen.x = 0;
-	gameover_screen.y = 0;
-	gameover_screen.width = WIN_WIDTH;
-	gameover_screen.height = WIN_HEIGHT;
+	background.x = 0;
+	background.y = 0;
+	background.width = WIN_WIDTH;
+	background.height = WIN_HEIGHT;
 	bullet.width = 5;
 	bullet.height = 10;
 	bullet.y = -10;
