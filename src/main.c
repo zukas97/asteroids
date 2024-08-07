@@ -275,6 +275,14 @@ void update() {
 			asteroid.vel = 250;
 			rocket.vel = 925;
 		}
+		else if (score >= 15 && score < 20) {
+			asteroid.vel = 275;
+			rocket.vel = 945;
+		}
+		else if (score >= 20 && score < 25) {
+			asteroid.vel = 300;
+			rocket.vel = 965;
+		}
 		
 	}
 

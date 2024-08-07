@@ -8,3 +8,4 @@ debug:
 	make 
 	gdb game
 	rm game
+
