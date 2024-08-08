@@ -18,7 +18,10 @@ to build run `make`
 
 you can also run `make run` to compile it, run it, and then remove it.
 
-# dependancies for the binairy release
+# Binairy
+I have not yet made a package for any distro as this is still in development but there is a binairy in releases
+
+Dependancies: <br />
 
 `SDL2`
 
