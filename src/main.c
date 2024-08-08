@@ -32,7 +32,6 @@ SDL_Texture *start_texture;
 
 SDL_Color white = {255, 255, 255};
 
-pthread_t input_thread;
 
 void setup();
 
@@ -45,6 +44,7 @@ struct Rocket {
 	int vel;
 	int left;
 	int right;
+	bool added;
 } rocket;
 
 struct Asteroid {
@@ -53,6 +53,7 @@ struct Asteroid {
 	int width;
 	int height;
 	int vel;
+	bool added;
 } asteroid;
 
 struct Background {
@@ -307,7 +308,23 @@ void update() {
 			//bullet.x = rocket.x;
 			bullet.y -= bullet.vel * dtime;
 
-			if (score < 5) {
+			if (asteroid.added == true && rocket.added == true && score % 5 != 0) {
+				rocket.added = false;
+				asteroid.added = false;
+			}
+
+			if (asteroid.added == false && score != 0 && score % 5 == 0) {
+				asteroid.vel += 30;
+				asteroid.added = true;
+				
+			}
+
+			if (rocket.added == false && score != 0 && score % 10 == 0) {
+				rocket.vel += 5;
+				rocket.added = true;
+			}
+
+			/*if (score < 5) {
 				asteroid.vel = 100;
 			}
 			else if (score >= 5 && score < 10) {
@@ -325,7 +342,7 @@ void update() {
 			else if (score >= 20 && score < 25) {
 				asteroid.vel = 300;
 				rocket.vel = 410;
-			}
+			}*/
 
 		
 		
@@ -371,6 +388,8 @@ void setup() {
 	rocket.right = 0;
 	rocket.left = 0;
 	bullet.vel = 700;
+	rocket.added = false;
+	asteroid.added = false;
 	summon_asteroid();
 
 }
