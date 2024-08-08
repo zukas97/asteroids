@@ -43,6 +43,8 @@ struct Rocket {
 	int width;
 	int height;
 	int vel;
+	int left;
+	int right;
 } rocket;
 
 struct Asteroid {
@@ -66,6 +68,7 @@ struct Bullet {
 	int y;
 	int width;
 	int height;
+	int vel;
 } bullet;
 
 
@@ -117,6 +120,16 @@ void input() {
 				case SDL_QUIT:
 					running = false;
 					break;
+				case SDL_KEYUP:
+					if (event.key.keysym.sym == SDLK_LEFT) {
+						rocket.left = 0;
+					}
+					else if (event.key.keysym.sym == SDLK_RIGHT){
+						rocket.right = 0;
+					}
+					break;
+
+
 				case SDL_KEYDOWN:
 					switch (event.key.keysym.sym) {
 						case SDLK_ESCAPE:
@@ -124,15 +137,18 @@ void input() {
 							break;
 						
 						case SDLK_LEFT:
-							if (rocket.x >= 10) {
-								rocket.x -= 500 * dtime;
-							}
+							/*if (rocket.x >= 10) {
+								rocket.x -= rocket.vel * dtime;
+							}*/
+							rocket.left = 1;
+							rocket.right = 0;
 							break;
 						case SDLK_RIGHT:
-							if (rocket.x <= WIN_WIDTH - 55) {
+							/*if (rocket.x <= WIN_WIDTH - 55) {
 								rocket.x += rocket.vel * dtime;
-							}
-						
+							}*/
+							rocket.right = 1;
+							rocket.left = 0;
 							break;
 						case SDLK_SPACE:
 							bullet.x = rocket.x + (rocket.width/2);
@@ -145,12 +161,11 @@ void input() {
 							else if (gameover == true) {
 								gameover = false;
 							}
-							break;
+					break;		break;
+											
 
-							
 
-
-					break;
+					
 					}
 			}
 		}
@@ -270,34 +285,49 @@ void update() {
 	last_frame_time = SDL_GetTicks();
 	if (started == true) {
 		if (gameover == false) {
-		asteroid.y += asteroid.vel * dtime;
+			asteroid.y += asteroid.vel * dtime;
 
-		if (asteroid.y >= WIN_HEIGHT) {
-			gameover = true;
-		}
+			if (asteroid.y >= WIN_HEIGHT) {
+				gameover = true;
+			}
 
-		//bullet.x = rocket.x;
-		bullet.y -= 500 * dtime;
+			if (rocket.left == 1) {
+				
+				if (rocket.x >= 10) {
+					rocket.x -= rocket.vel * dtime;
+				}
+			}
+			if (rocket.right == 1) {
+				if (rocket.x <= WIN_WIDTH - 55) {
+					rocket.x += rocket.vel * dtime;
+				}
+				
+			}
 
-		if (score < 5) {
-			asteroid.vel = 100;
-		}
-		else if (score >= 5 && score < 10) {
-			asteroid.vel = 200;
-			rocket.vel = 915;
-		}
-		else if (score >= 10 && score < 15) {
-			asteroid.vel = 250;
-			rocket.vel = 925;
-		}
-		else if (score >= 15 && score < 20) {
-			asteroid.vel = 275;
-			rocket.vel = 945;
-		}
-		else if (score >= 20 && score < 25) {
-			asteroid.vel = 300;
-			rocket.vel = 965;
-		}
+			//bullet.x = rocket.x;
+			bullet.y -= bullet.vel * dtime;
+
+			if (score < 5) {
+				asteroid.vel = 100;
+			}
+			else if (score >= 5 && score < 10) {
+				asteroid.vel = 200;
+				//rocket.vel = 505;
+			}
+			else if (score >= 10 && score < 15) {
+				asteroid.vel = 250;
+				rocket.vel = 405;
+			}
+			else if (score >= 15 && score < 20) {
+				asteroid.vel = 275;
+				//rocket.vel = 515;
+			}
+			else if (score >= 20 && score < 25) {
+				asteroid.vel = 300;
+				rocket.vel = 410;
+			}
+
+		
 		
 	}
 
@@ -324,7 +354,6 @@ void setup() {
 	rocket.y = 620;
 	rocket.width = 46;
 	rocket.height = 82;
-	rocket.vel = 0;
 	//asteroid.x = 100;
 	//asteroid.y = -100;
 	asteroid.width = 50;
@@ -337,8 +366,11 @@ void setup() {
 	bullet.height = 10;
 	bullet.y = -10;
 	asteroid.vel = 100;
-	rocket.vel = 900;
+	rocket.vel = 400;
 	score = 0;
+	rocket.right = 0;
+	rocket.left = 0;
+	bullet.vel = 700;
 	summon_asteroid();
 
 }
