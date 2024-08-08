@@ -106,8 +106,6 @@ int Init_Win(void) {
 		fprintf(stderr, "Error initalizing SDL_image\n");
 		return false;
 	}
-
-
 	return true;
 
 }
@@ -115,7 +113,6 @@ int Init_Win(void) {
 
 void input() {
 		SDL_Event event;
-		//int is_pressed = event.key.state == SDL_PRESSED;
 		if (SDL_PollEvent(&event)){
 			switch (event.type) {
 				case SDL_QUIT:
@@ -138,16 +135,10 @@ void input() {
 							break;
 						
 						case SDLK_LEFT:
-							/*if (rocket.x >= 10) {
-								rocket.x -= rocket.vel * dtime;
-							}*/
 							rocket.left = 1;
 							rocket.right = 0;
 							break;
 						case SDLK_RIGHT:
-							/*if (rocket.x <= WIN_WIDTH - 55) {
-								rocket.x += rocket.vel * dtime;
-							}*/
 							rocket.right = 1;
 							rocket.left = 0;
 							break;
@@ -250,8 +241,6 @@ void render() {
 			}
 		}
 		else if (gameover == true) {
-			//pthread_join(input_thread, NULL);
-			
 			SDL_RenderClear(rend);
 			SDL_Surface * background_surface = IMG_Load("./images/gameover.png");
 			SDL_Texture* background_texture = SDL_CreateTextureFromSurface(rend, background_surface);
@@ -324,26 +313,6 @@ void update() {
 				rocket.added = true;
 			}
 
-			/*if (score < 5) {
-				asteroid.vel = 100;
-			}
-			else if (score >= 5 && score < 10) {
-				asteroid.vel = 200;
-				//rocket.vel = 505;
-			}
-			else if (score >= 10 && score < 15) {
-				asteroid.vel = 250;
-				rocket.vel = 405;
-			}
-			else if (score >= 15 && score < 20) {
-				asteroid.vel = 275;
-				//rocket.vel = 515;
-			}
-			else if (score >= 20 && score < 25) {
-				asteroid.vel = 300;
-				rocket.vel = 410;
-			}*/
-
 		
 		
 	}
@@ -371,8 +340,6 @@ void setup() {
 	rocket.y = 620;
 	rocket.width = 46;
 	rocket.height = 82;
-	//asteroid.x = 100;
-	//asteroid.y = -100;
 	asteroid.width = 50;
 	asteroid.height = 50;
 	background.x = 0;
