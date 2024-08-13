@@ -349,7 +349,7 @@ void setup() {
 	bullet.width = 5;
 	bullet.height = 10;
 	bullet.y = -10;
-	asteroid.vel = 100;
+	asteroid.vel = 130;
 	rocket.vel = 400;
 	score = 0;
 	rocket.right = 0;
