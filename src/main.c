@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include "defs.h"
-#include "win_actions.h"
+#include "actions.h"
 
 
 //Globals
@@ -16,7 +16,7 @@ SDL_Renderer *rend = NULL;
 int running = false;
 int last_frame_time;
 float dtime;
-bool gameover;
+bool gameover = false;
 bool started = false;
 
 int score;
@@ -157,10 +157,10 @@ void input() {
 }
 
 void summon_asteroid() {
-	int rand_y;
+	int rand_x;
 	srand(time(NULL));
-	rand_y = rand() % 700;
-	asteroid.x = rand_y;
+	rand_x = rand() % 700;
+	asteroid.x = rand_x;
 	asteroid.y = -50;
 }
 
@@ -227,8 +227,8 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 			SDL_DestroyTexture(rocket_texture);
 			
 			if (SDL_HasIntersection(&Bullet, &Asteroid)) {
-				asteroid.y = -50;
 				bullet.y = -10;
+				asteroid.y = -50;
 				summon_asteroid();
 				score += 1;
 			}
@@ -273,6 +273,8 @@ void update() {
 			if (asteroid.y >= WIN_HEIGHT) {
 				gameover = true;
 			}
+
+			
 
 			if (rocket.left == 1) {
 				
