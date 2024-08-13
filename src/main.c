@@ -7,10 +7,10 @@
 #include <stdbool.h>
 #include <time.h>
 #include "defs.h"
+#include "win_actions.h"
 
 
 //Globals
-SDL_Window *win = NULL;
 SDL_Renderer *rend = NULL;
 
 int running = false;
@@ -21,14 +21,6 @@ bool started = false;
 
 int score;
 
-SDL_Surface *rocket_surface;
-SDL_Texture *rocket_texture;
-
-SDL_Surface *asteroid_surface;
-SDL_Texture *asteroid_texture;
-
-SDL_Surface *start_surface;
-SDL_Texture *start_texture;
 
 SDL_Color white = {255, 255, 255};
 
@@ -74,7 +66,8 @@ struct Bullet {
 
 
 
-int Init_Win(void) {
+int Init_Win(SDL_Window *win) {
+	win = NULL;
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		fprintf(stderr, "Error initalizing SDL\n");
 		return false;
@@ -172,7 +165,7 @@ void summon_asteroid() {
 }
 
 
-void render() {
+void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surface *asteroid_surface, SDL_Texture *asteroid_texture, SDL_Surface* start_surface, SDL_Texture* start_texture) {
 	SDL_Rect Rocket = {
 		rocket.x,
 		rocket.y,
@@ -327,13 +320,13 @@ void update() {
 	
 }
 
-void destroy() {
+/*void destroy(SDL_Window *win) {
 	SDL_DestroyTexture(asteroid_texture);
 	SDL_DestroyTexture(rocket_texture);
 	SDL_DestroyRenderer(rend);
 	SDL_DestroyWindow(win);
 	SDL_Quit();
-}
+}*/
 
 void setup() {
 	rocket.x = (WIN_WIDTH / 2) - 20;
@@ -361,15 +354,22 @@ void setup() {
 
 }
 int main() {
-	running = Init_Win();
+	SDL_Surface *rocket_surface;
+	SDL_Texture *rocket_texture;
+	SDL_Surface *asteroid_surface;
+	SDL_Texture *asteroid_texture;
+	SDL_Surface *start_surface;
+	SDL_Texture *start_texture;
+	SDL_Window *win = NULL;
+	running = Init_Win(win);
 	
 	setup();
 
 	while (running) {
 		input();
 		update();
-		render();
+		render(rocket_surface, rocket_texture, asteroid_surface, asteroid_texture, start_surface, start_texture);
 	}
-	destroy();
+	destroy(win, rend, asteroid_texture, rocket_texture);
 	return 0;
 }
