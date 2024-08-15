@@ -322,13 +322,6 @@ void update() {
 	
 }
 
-/*void destroy(SDL_Window *win) {
-	SDL_DestroyTexture(asteroid_texture);
-	SDL_DestroyTexture(rocket_texture);
-	SDL_DestroyRenderer(rend);
-	SDL_DestroyWindow(win);
-	SDL_Quit();
-}*/
 
 void setup() {
 	rocket.x = (WIN_WIDTH / 2) - 20;
