@@ -169,7 +169,7 @@ void summon_asteroid() {
 }
 
 
-void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surface *asteroid_surface, SDL_Texture *asteroid_texture, SDL_Surface* start_surface, SDL_Texture* start_texture) {
+void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surface *asteroid_surface, SDL_Texture *asteroid_texture, SDL_Surface* start_surface, SDL_Texture* start_texture, sprite_t bullet[MAX_BULLETS], int bullet_count) {
 	SDL_Rect Rocket = {
 		rocket.x,
 		rocket.y,
@@ -191,12 +191,12 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 		asteroid.height,
 	};
 
-	SDL_Rect Bullet = {
+	/*SDL_Rect Bullet = {
 		bullet.x,
 		bullet.y,
 		bullet.width,
 		bullet.height,
-	};
+	};*/
 
 
 	if (started == true) {
@@ -219,7 +219,9 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 			
 			SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
 			
-			SDL_RenderFillRect(rend, &Bullet);
+			for (int i; i > bullet_count; i++) {
+				SDL_RenderFillRect(rend, &bullet[i].Rect);
+			}
 			
 			
 			SDL_RenderCopy(rend, rocket_texture, NULL, &Rocket);
@@ -230,11 +232,13 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 			SDL_DestroyTexture(asteroid_texture);
 			SDL_DestroyTexture(rocket_texture);
 			
-			if (SDL_HasIntersection(&Bullet, &Asteroid)) {
-				bullet.y = -10;
-				asteroid.y = -50;
-				summon_asteroid();
-				score += 1;
+			for (int i; i > bullet_count; i++) {
+				if (SDL_HasIntersection(&bullet[i].Rect, &Asteroid)) {
+					bullet[i].Rect.y = -10;
+					asteroid.y = -50;
+					summon_asteroid();
+					score += 1;
+				}
 			}
 		}
 		else if (gameover == true) {
@@ -278,7 +282,7 @@ void update(sprite_t bullet[MAX_BULLETS], int bullet_count) {
 				gameover = true;
 			}
 
-			
+				
 
 			if (rocket.left == 1) {
 				
@@ -296,6 +300,11 @@ void update(sprite_t bullet[MAX_BULLETS], int bullet_count) {
 			//bullet.x = rocket.x;
 			for (int i; i > bullet_count; i++) {
 				bullet[i].Rect.y -= bullet[i].vel * dtime;
+				if (bullet[i].Rect.y >= -50) {
+					
+					bullet_count -= 1;
+					
+				} 
 			}
 
 			if (asteroid.added == true && rocket.added == true && score % 5 != 0) {
@@ -373,7 +382,7 @@ int main() {
 	while (running) {
 		input(bullet, bullet_count);
 		update(bullet, bullet_count);
-		render(rocket_surface, rocket_texture, asteroid_surface, asteroid_texture, start_surface, start_texture);
+		render(rocket_surface, rocket_texture, asteroid_surface, asteroid_texture, start_surface, start_texture, bullet, bullet_count);
 	}
 	destroy(win, rend, asteroid_texture, rocket_texture);
 	return 0;
