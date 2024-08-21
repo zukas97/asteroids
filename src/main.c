@@ -56,13 +56,15 @@ struct Background {
 	
 } background;
 
-struct Bullet {
+/*struct Bullet {
 	int x;
 	int y;
 	int width;
 	int height;
 	int vel;
-} bullet;
+} bullet;*/
+
+sprite_t bullet[MAX_BULLETS];
 
 
 
@@ -72,6 +74,8 @@ int Init_Win(SDL_Window *win) {
 		fprintf(stderr, "Error initalizing SDL\n");
 		return false;
 	}
+
+	
 
 	win = SDL_CreateWindow(
 		"Asteriods",
