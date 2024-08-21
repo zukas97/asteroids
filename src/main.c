@@ -25,7 +25,7 @@ int score;
 SDL_Color white = {255, 255, 255};
 
 
-void setup();
+void setup(sprite_t bullet[MAX_BULLETS]);
 
 //Sprites
 struct Rocket {
@@ -64,7 +64,6 @@ struct Background {
 	int vel;
 } bullet;*/
 
-sprite_t bullet[MAX_BULLETS];
 
 
 
@@ -108,7 +107,7 @@ int Init_Win(SDL_Window *win) {
 }
 
 
-void input() {
+void input(sprite_t bullet[MAX_BULLETS], int bullet_count) {
 		SDL_Event event;
 		if (SDL_PollEvent(&event)){
 			switch (event.type) {
@@ -140,8 +139,9 @@ void input() {
 							rocket.left = 0;
 							break;
 						case SDLK_SPACE:
-							bullet.x = rocket.x + (rocket.width/2);
-							bullet.y = rocket.y;
+							bullet_count += 1;
+							bullet[bullet_count].Rect.x = rocket.x + (rocket.width/2);
+							bullet[bullet_count].Rect.y = rocket.y;
 							break;
 						case SDLK_RETURN:
 							if (!started) {
@@ -260,7 +260,7 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 	}
 }
 
-void update() {
+void update(sprite_t bullet[MAX_BULLETS], int bullet_count) {
 	int wait_time = FRAME_TIME - (SDL_GetTicks() - last_frame_time);
 
 	if (wait_time > 0 && wait_time <= FRAME_TIME) {
@@ -294,7 +294,9 @@ void update() {
 			}
 
 			//bullet.x = rocket.x;
-			bullet.y -= bullet.vel * dtime;
+			for (int i; i > bullet_count; i++) {
+				bullet[i].Rect.y -= bullet[i].vel * dtime;
+			}
 
 			if (asteroid.added == true && rocket.added == true && score % 5 != 0) {
 				rocket.added = false;
@@ -317,7 +319,7 @@ void update() {
 	}
 
 	if (gameover == true) {
-		setup();
+		setup(bullet);
 
 	}
 
@@ -327,7 +329,7 @@ void update() {
 }
 
 
-void setup() {
+void setup(sprite_t bullet[MAX_BULLETS]) {
 	rocket.x = (WIN_WIDTH / 2) - 20;
 	rocket.y = 620;
 	rocket.width = 46;
@@ -338,15 +340,17 @@ void setup() {
 	background.y = 0;
 	background.width = WIN_WIDTH;
 	background.height = WIN_HEIGHT;
-	bullet.width = 5;
-	bullet.height = 10;
-	bullet.y = -10;
+	for (int i; i > MAX_BULLETS; i++) {
+		bullet[i].Rect.w = 5;
+		bullet[i].Rect.h = 10;
+		bullet[i].Rect.y = -10;
+		bullet[i].vel = 700;
+	}
 	asteroid.vel = 130;
 	rocket.vel = 400;
 	score = 0;
 	rocket.right = 0;
 	rocket.left = 0;
-	bullet.vel = 700;
 	rocket.added = false;
 	asteroid.added = false;
 	summon_asteroid();
@@ -360,13 +364,15 @@ int main() {
 	SDL_Surface *start_surface;
 	SDL_Texture *start_texture;
 	SDL_Window *win = NULL;
+	int bullet_count;
+	sprite_t bullet[MAX_BULLETS];
 	running = Init_Win(win);
 	
-	setup();
+	setup(bullet);
 
 	while (running) {
-		input();
-		update();
+		input(bullet, bullet_count);
+		update(bullet, bullet_count);
 		render(rocket_surface, rocket_texture, asteroid_surface, asteroid_texture, start_surface, start_texture);
 	}
 	destroy(win, rend, asteroid_texture, rocket_texture);
