@@ -140,11 +140,13 @@ void input(sprite_t bullet[MAX_BULLETS], int bullet_count) {
 							break;
 						case SDLK_SPACE:
 							//bullet_count += 1;
-							for (int i; i > MAX_BULLETS; i++) {
-								bullet[i].Rect.x = rocket.x + (rocket.width/2);
-								bullet[i].Rect.y = rocket.y;
-								bullet[i].onscreen = true;
-								break;
+							for (int i=1; i >= MAX_BULLETS; i++) {
+								if (!bullet[i].onscreen) {
+									bullet[i].Rect.x = rocket.x + (rocket.width/2);
+									bullet[i].Rect.y = rocket.y;
+									bullet[i].onscreen = true;
+									break;
+								}
 							}
 							break;
 						case SDLK_RETURN:
@@ -223,8 +225,10 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 			
 			SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
 			
-			for (int i; i > bullet_count; i++) {
-				SDL_RenderFillRect(rend, &bullet[i].Rect);
+			for (int i = 1; i >= MAX_BULLETS; i++) {
+				if (bullet[i].onscreen) {
+					SDL_RenderFillRect(rend, &bullet[i].Rect);
+				}
 			}
 			
 			
@@ -236,7 +240,7 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 			SDL_DestroyTexture(asteroid_texture);
 			SDL_DestroyTexture(rocket_texture);
 			
-			for (int i; i > MAX_BULLETS; i++) {
+			for (int i = 1; i >= MAX_BULLETS; i++) {
 				if (SDL_HasIntersection(&bullet[i].Rect, &Asteroid)) {
 					bullet[i].Rect.y = -10;
 					asteroid.y = -50;
@@ -302,7 +306,7 @@ void update(sprite_t bullet[MAX_BULLETS], int bullet_count) {
 			}
 
 			//bullet.x = rocket.x;
-			for (int i; i > MAX_BULLETS; i++) {
+			for (int i = 1; i >= MAX_BULLETS; i++) {
 				if (bullet[i].onscreen) {
 					bullet[i].Rect.y -= bullet[i].vel * dtime;
 					if (bullet[i].Rect.y >= -10) {
@@ -354,12 +358,12 @@ void setup(sprite_t bullet[MAX_BULLETS]) {
 	background.y = 0;
 	background.width = WIN_WIDTH;
 	background.height = WIN_HEIGHT;
-	for (int i; i > MAX_BULLETS; i++) {
-		bullet[i].Rect.w = 5;
-		bullet[i].Rect.h = 10;
-		bullet[i].Rect.y = -10;
+	for (int i = 1; i >= MAX_BULLETS; i++) {
 		bullet[i].vel = 700;
 		bullet[i].onscreen = false;
+		bullet[i].Rect.h = 10;
+		bullet[i].Rect.w = 5;
+		bullet[i].Rect.y = -10;
 	}
 	asteroid.vel = 130;
 	rocket.vel = 400;
