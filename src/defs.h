@@ -11,4 +11,5 @@
 typedef struct {
 	SDL_Rect Rect;
 	int vel;
+	bool onscreen;
 } sprite_t;

@@ -139,9 +139,13 @@ void input(sprite_t bullet[MAX_BULLETS], int bullet_count) {
 							rocket.left = 0;
 							break;
 						case SDLK_SPACE:
-							bullet_count += 1;
-							bullet[bullet_count].Rect.x = rocket.x + (rocket.width/2);
-							bullet[bullet_count].Rect.y = rocket.y;
+							//bullet_count += 1;
+							for (int i; i > MAX_BULLETS; i++) {
+								bullet[i].Rect.x = rocket.x + (rocket.width/2);
+								bullet[i].Rect.y = rocket.y;
+								bullet[i].onscreen = true;
+								break;
+							}
 							break;
 						case SDLK_RETURN:
 							if (!started) {
@@ -232,7 +236,7 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 			SDL_DestroyTexture(asteroid_texture);
 			SDL_DestroyTexture(rocket_texture);
 			
-			for (int i; i > bullet_count; i++) {
+			for (int i; i > MAX_BULLETS; i++) {
 				if (SDL_HasIntersection(&bullet[i].Rect, &Asteroid)) {
 					bullet[i].Rect.y = -10;
 					asteroid.y = -50;
@@ -298,13 +302,14 @@ void update(sprite_t bullet[MAX_BULLETS], int bullet_count) {
 			}
 
 			//bullet.x = rocket.x;
-			for (int i; i > bullet_count; i++) {
-				bullet[i].Rect.y -= bullet[i].vel * dtime;
-				if (bullet[i].Rect.y >= -50) {
-					
-					bullet_count -= 1;
-					
-				} 
+			for (int i; i > MAX_BULLETS; i++) {
+				if (bullet[i].onscreen) {
+					bullet[i].Rect.y -= bullet[i].vel * dtime;
+					if (bullet[i].Rect.y >= -10) {
+						bullet[i].onscreen = false;
+						//bullet_count -= 1;	
+				}
+				}
 			}
 
 			if (asteroid.added == true && rocket.added == true && score % 5 != 0) {
@@ -354,6 +359,7 @@ void setup(sprite_t bullet[MAX_BULLETS]) {
 		bullet[i].Rect.h = 10;
 		bullet[i].Rect.y = -10;
 		bullet[i].vel = 700;
+		bullet[i].onscreen = false;
 	}
 	asteroid.vel = 130;
 	rocket.vel = 400;
