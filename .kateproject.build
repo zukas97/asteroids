@@ -1,0 +1,37 @@
+{
+    "Auto_generated": "This file is auto-generated. Any extra tags or formatting will be lost",
+    "target_sets": [
+        {
+            "directory": "",
+            "name": "Target Set",
+            "targets": [
+                {
+                    "build_cmd": "",
+                    "name": "build",
+                    "run_cmd": ""
+                }
+            ]
+        },
+        {
+            "directory": "/home/zukas/projects/asteroids",
+            "name": "Target Set+",
+            "targets": [
+                {
+                    "build_cmd": "make",
+                    "name": "Build",
+                    "run_cmd": ""
+                },
+                {
+                    "build_cmd": "make clean",
+                    "name": "Clean",
+                    "run_cmd": ""
+                },
+                {
+                    "build_cmd": "make run",
+                    "name": "run",
+                    "run_cmd": ""
+                }
+            ]
+        }
+    ]
+}
