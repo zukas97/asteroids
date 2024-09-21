@@ -340,7 +340,7 @@ void setup() {
 	score = 0;
 	rocket.right = 0;
 	rocket.left = 0;
-	bullet.vel = 700;
+	bullet.vel = 1000;
 	rocket.added = false;
 	asteroid.added = false;
 	summon_asteroid();
