@@ -27,10 +27,7 @@ void setup();
 
 //Sprites
 struct Rocket {
-	int x;
-	int y;
-	int width;
-	int height;
+	SDL_Rect rect;
 	int vel;
 	int left;
 	int right;
@@ -38,34 +35,28 @@ struct Rocket {
 } rocket;
 
 struct Asteroid {
-	int x;
-	int y;
-	int width;
-	int height;
+	SDL_Rect rect;
 	int vel;
 	bool added;
 } asteroid;
 
 struct Background {
-	int x;
-	int y;
-	int width;
-	int height;
+	SDL_Rect rect;
 	
 } background;
 
-struct Bullet {
-	int x;
-	int y;
-	int width;
-	int height;
+typedef struct {
+	SDL_Rect rect;
 	int vel;
-} bullet;
+} Bullet;
+
+Bullet bullet;
 
 
 
 int Init_Win(SDL_Window *win) {
-	win = NULL;
+	//win = NULL;
+	//rend = NULL;
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		fprintf(stderr, "Error initalizing SDL\n");
 		return false;
@@ -90,6 +81,7 @@ int Init_Win(SDL_Window *win) {
 
 	if (!rend) {
 		fprintf(stderr, "Error initalizing renderer\n");
+		printf("Error initalizing renderer\n");
 		return false;
 	}
 
@@ -134,8 +126,8 @@ void input() {
 							rocket.left = 0;
 							break;
 						case SDLK_SPACE:
-							bullet.x = rocket.x + (rocket.width/2);
-							bullet.y = rocket.y;
+							bullet.rect.x = rocket.rect.x + (rocket.rect.w/2);
+							bullet.rect.y = rocket.rect.y;
 							break;
 						case SDLK_RETURN:
 							if (!started) {
@@ -158,45 +150,17 @@ void summon_asteroid() {
 	int rand_x;
 	srand(time(NULL));
 	rand_x = rand() % 700;
-	asteroid.x = rand_x;
-	asteroid.y = -50;
+	asteroid.rect.x = rand_x;
+	asteroid.rect.y = ASTEROID_START;
 }
 
 
 void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surface *asteroid_surface, SDL_Texture *asteroid_texture, SDL_Surface* start_surface, SDL_Texture* start_texture) {
-	SDL_Rect Rocket = {
-		rocket.x,
-		rocket.y,
-		rocket.width,
-		rocket.height,
-	};
-
-	SDL_Rect Background = {
-		background.x,
-		background.y,
-		background.width,
-		background.height,
-	};
-
-	SDL_Rect Asteroid = {
-		asteroid.x,
-		asteroid.y,
-		asteroid.width,
-		asteroid.height,
-	};
-
-	SDL_Rect Bullet = {
-		bullet.x,
-		bullet.y,
-		bullet.width,
-		bullet.height,
-	};
-
 
 	if (started == true) {
 		if (gameover == false) {
 		
-			if (SDL_HasIntersection(&Rocket, &Asteroid)) {
+			if (SDL_HasIntersection(&rocket.rect, &asteroid.rect)) {
 				gameover = true;
 			}
 
@@ -213,41 +177,41 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 			
 			SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
 			
-			SDL_RenderFillRect(rend, &Bullet);
+			SDL_RenderFillRect(rend, &bullet.rect);
 			
 			
-			SDL_RenderCopy(rend, rocket_texture, NULL, &Rocket);
-			SDL_RenderCopy(rend, asteroid_texture, NULL, &Asteroid);
+			SDL_RenderCopy(rend, rocket_texture, NULL, &rocket.rect);
+			SDL_RenderCopy(rend, asteroid_texture, NULL, &asteroid.rect);
 			
 			SDL_RenderPresent(rend); 
 			SDL_RenderClear(rend);
 			SDL_DestroyTexture(asteroid_texture);
 			SDL_DestroyTexture(rocket_texture);
 			
-			if (SDL_HasIntersection(&Bullet, &Asteroid)) {
-				bullet.y = -10;
-				asteroid.y = -50;
+			if (SDL_HasIntersection(&bullet.rect, &asteroid.rect)) {
+				bullet.rect.y = -10;
+				asteroid.rect.y = ASTEROID_START;
 				summon_asteroid();
 				score += 1;
 			}
 		}
-		else if (gameover == true) {
+		else if (gameover) {
 			SDL_RenderClear(rend);
 			SDL_Surface * background_surface = IMG_Load("./images/gameover.png");
 			SDL_Texture* background_texture = SDL_CreateTextureFromSurface(rend, background_surface);
 			SDL_FreeSurface(background_surface);
-			SDL_RenderCopy(rend, background_texture, NULL, &Background);
+			SDL_RenderCopy(rend, background_texture, NULL, &background.rect);
 			SDL_RenderPresent(rend);
 			SDL_DestroyTexture(background_texture);
 
 
 		}
 	}
-	else if (started == false) {
+	else if (!started) {
 		SDL_Surface * background_surface = IMG_Load("./images/home.png");
 		SDL_Texture* background_texture = SDL_CreateTextureFromSurface(rend, background_surface);
 		SDL_FreeSurface(background_surface);
-		SDL_RenderCopy(rend, background_texture, NULL, &Background);
+		SDL_RenderCopy(rend, background_texture, NULL, &background.rect);
 		SDL_RenderPresent(rend);
 		SDL_DestroyTexture(background_texture);
 		
@@ -266,9 +230,9 @@ void update() {
 	last_frame_time = SDL_GetTicks();
 	if (started == true) {
 		if (gameover == false) {
-			asteroid.y += asteroid.vel * dtime;
+			asteroid.rect.y += asteroid.vel * dtime;
 
-			if (asteroid.y >= WIN_HEIGHT) {
+			if (asteroid.rect.y >= WIN_HEIGHT) {
 				gameover = true;
 			}
 
@@ -276,19 +240,19 @@ void update() {
 
 			if (rocket.left == 1) {
 				
-				if (rocket.x >= 10) {
-					rocket.x -= rocket.vel * dtime;
+				if (rocket.rect.x >= 10) {
+					rocket.rect.x -= rocket.vel * dtime;
 				}
 			}
 			if (rocket.right == 1) {
-				if (rocket.x <= WIN_WIDTH - 55) {
-					rocket.x += rocket.vel * dtime;
+				if (rocket.rect.x <= WIN_WIDTH - 55) {
+					rocket.rect.x += rocket.vel * dtime;
 				}
 				
 			}
 
 			//bullet.x = rocket.x;
-			bullet.y -= bullet.vel * dtime;
+			bullet.rect.y -= bullet.vel * dtime;
 
 			if (asteroid.added == true && rocket.added == true && score % 5 != 0) {
 				rocket.added = false;
@@ -310,7 +274,7 @@ void update() {
 		
 	}
 
-	if (gameover == true) {
+	if (gameover) {
 		setup();
 
 	}
@@ -322,19 +286,19 @@ void update() {
 
 
 void setup() {
-	rocket.x = (WIN_WIDTH / 2) - 20;
-	rocket.y = 620;
-	rocket.width = 46;
-	rocket.height = 82;
-	asteroid.width = 50;
-	asteroid.height = 50;
-	background.x = 0;
-	background.y = 0;
-	background.width = WIN_WIDTH;
-	background.height = WIN_HEIGHT;
-	bullet.width = 5;
-	bullet.height = 10;
-	bullet.y = -10;
+	rocket.rect.x = (WIN_WIDTH / 2) - 20;
+	rocket.rect.y = 620;
+	rocket.rect.w = 46;
+	rocket.rect.h = 82;
+	asteroid.rect.w= 50;
+	asteroid.rect.h= 50;
+	background.rect.x = 0;
+	background.rect.y = 0;
+	background.rect.w= WIN_WIDTH;
+	background.rect.h= WIN_HEIGHT;
+	bullet.rect.w = 5;
+	bullet.rect.h= 10;
+	bullet.rect.y = -10;
 	asteroid.vel = 130;
 	rocket.vel = 400;
 	score = 0;
