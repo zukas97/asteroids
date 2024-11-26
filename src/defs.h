@@ -6,3 +6,4 @@
 #define FPS 60
 #define FRAME_TIME (1000/FPS)
 
+#define MAX_BULLETS 10
