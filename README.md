@@ -3,7 +3,7 @@
 
 A simple asteroid shooting game made in C with SDL.
 
-this is still a WIP but can now can be considered a "game" (sort-of)
+The binairy I released is compiled on linux so I don't know if it will work on windows.
 
 # Building 
 
@@ -21,7 +21,7 @@ you can also run `make run` to compile it, run it, and then remove it.
 # Binairy
 I have not yet made a package for any distro as this is still in development but there is a binairy in releases
 
-Dependancies: <br />
+<u>Dependancies:</u> <br />
 
 `SDL2`
 
