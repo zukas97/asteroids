@@ -7,3 +7,4 @@
 #define FRAME_TIME (1000/FPS)
 
 #define MAX_BULLETS 10
+#define ASTEROID_INCRAMENT 80

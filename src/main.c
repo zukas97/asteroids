@@ -195,11 +195,11 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 			SDL_DestroyTexture(rocket_texture);
 			
 			for (int i=0; i <= MAX_BULLETS; i++) {
-				if (SDL_HasIntersection(&bullet[i].rect, &asteroid.rect)) {
-					bullet[i].rect.y = -10;
-					asteroid.rect.y = ASTEROID_START;
+				if (SDL_HasIntersection(&bullet[i].rect, &asteroid.rect) && bullet[i].onscreen) {
+					bullet[i].onscreen = false;
 					summon_asteroid();
 					score += 1;
+					break;
 				}
 			}
 		}
@@ -258,8 +258,6 @@ void update() {
 				}
 				
 			}
-
-			//bullet.x = rocket.x;
 			for (int i = 0; i <= MAX_BULLETS; i++) {
 				if (bullet[i].onscreen) {
 					bullet[i].rect.y -= bullet[i].vel * dtime;
@@ -269,13 +267,14 @@ void update() {
 				}
 			}
 
-			if (asteroid.added == true && rocket.added == true && score % 5 != 0) {
+			if (asteroid.added && rocket.added && score % 5 != 0) {
+				asteroid.vel += ASTEROID_INCRAMENT;
 				rocket.added = false;
 				asteroid.added = false;
 			}
 
-			if (asteroid.added == false && score != 0 && score % 5 == 0) {
-				asteroid.vel += 30;
+			if (!asteroid.added && score != 0 && score % 5 == 0) {
+				asteroid.vel += ASTEROID_INCRAMENT;
 				asteroid.added = true;
 				
 			}
