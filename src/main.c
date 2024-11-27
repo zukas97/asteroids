@@ -6,7 +6,7 @@
 #include <time.h>
 #include "defs.h"
 #include "actions.h"
-
+#include "sprites.h"
 
 //Globals
 SDL_Renderer *rend = NULL;
@@ -19,40 +19,16 @@ bool started = false;
 
 int score;
 
+Asteroid asteroid;
+Background background;
+Rocket rocket;
+Bullet bullet[MAX_BULLETS];
+
 
 SDL_Color white = {255, 255, 255};
 
-
-typedef struct Bullet Bullet;
 void setup();
 
-//Sprites
-struct Rocket {
-	SDL_Rect rect;
-	int vel;
-	int left;
-	int right;
-	bool added;
-} rocket;
-
-struct Asteroid {
-	SDL_Rect rect;
-	int vel;
-	bool added;
-} asteroid;
-
-struct Background {
-	SDL_Rect rect;
-	
-} background;
-
-struct Bullet {
-	SDL_Rect rect;
-	int vel;
-	bool onscreen;
-};
-
-Bullet bullet[MAX_BULLETS];
 
 
 int Init_Win(SDL_Window *win) {
@@ -77,7 +53,7 @@ int Init_Win(SDL_Window *win) {
 		return false;
 	}
 
-	rend = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
+	rend = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (!rend) {
 		fprintf(stderr, "Error initalizing renderer\n");
 		printf("Error initalizing renderer\n");
@@ -132,11 +108,13 @@ void input() {
 								}
 							}
 						case SDLK_RETURN:
-							if (!started) {
-								started = true;
-							}
-							else if (gameover == true) {
-								gameover = false;
+							if (event.key.keysym.sym != SDLK_SPACE) {
+								if (!started) {
+									started = true;
+								}
+								else if (gameover) {
+									gameover = false;
+								}
 							}
 					break;		break;
 											
@@ -147,7 +125,6 @@ void input() {
 			}
 		}
 }
-
 void summon_asteroid() {
 	int rand_x;
 	srand(time(NULL));
@@ -155,6 +132,7 @@ void summon_asteroid() {
 	asteroid.rect.x = rand_x;
 	asteroid.rect.y = ASTEROID_START;
 }
+
 
 
 void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surface *asteroid_surface, SDL_Texture *asteroid_texture, SDL_Surface* start_surface, SDL_Texture* start_texture) {
@@ -194,14 +172,6 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 			SDL_DestroyTexture(asteroid_texture);
 			SDL_DestroyTexture(rocket_texture);
 			
-			for (int i=0; i <= MAX_BULLETS; i++) {
-				if (SDL_HasIntersection(&bullet[i].rect, &asteroid.rect) && bullet[i].onscreen) {
-					bullet[i].onscreen = false;
-					summon_asteroid();
-					score += 1;
-					break;
-				}
-			}
 		}
 		else if (gameover) {
 			SDL_RenderClear(rend);
@@ -265,6 +235,12 @@ void update() {
 				if (bullet[i].rect.y <= 0 - bullet[i].rect.h) {
 					bullet[i].onscreen = false;
 				}
+				if (SDL_HasIntersection(&bullet[i].rect, &asteroid.rect) && bullet[i].onscreen) {
+					bullet[i].onscreen = false;
+					summon_asteroid();
+					score += 1;
+					break;
+				}
 			}
 
 			if (asteroid.added && rocket.added && score % 5 != 0) {
@@ -280,7 +256,7 @@ void update() {
 			}
 
 			if (rocket.added == false && score != 0 && score % 10 == 0) {
-				rocket.vel += 5;
+				rocket.vel += 10;
 				rocket.added = true;
 			}
 
@@ -311,7 +287,7 @@ void setup() {
 	background.rect.w= WIN_WIDTH;
 	background.rect.h= WIN_HEIGHT;
 	asteroid.vel = 130;
-	rocket.vel = 400;
+	rocket.vel = 420;
 	score = 0;
 	rocket.right = 0;
 	rocket.left = 0;
