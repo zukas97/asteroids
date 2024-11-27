@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include <time.h>
 #include "defs.h"
@@ -16,8 +17,8 @@ int last_frame_time;
 float dtime;
 bool gameover = false;
 bool started = false;
-
 int score;
+
 
 Asteroid asteroid;
 Background background;
@@ -32,8 +33,6 @@ void setup();
 
 
 int Init_Win(SDL_Window *win) {
-	//win = NULL;
-	//rend = NULL;
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		fprintf(stderr, "Error initalizing SDL\n");
 		return false;
@@ -61,6 +60,10 @@ int Init_Win(SDL_Window *win) {
 	}
 
 	if (!IMG_Init(IMG_INIT_PNG)) {
+		fprintf(stderr, "Error initalizing SDL_image\n");
+		return false;
+	}
+	if (!TTF_Init()) {
 		fprintf(stderr, "Error initalizing SDL_image\n");
 		return false;
 	}
@@ -135,7 +138,7 @@ void summon_asteroid() {
 
 
 
-void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surface *asteroid_surface, SDL_Texture *asteroid_texture, SDL_Surface* start_surface, SDL_Texture* start_texture) {
+void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surface *asteroid_surface, SDL_Texture *asteroid_texture, SDL_Surface* start_surface, SDL_Texture* start_texture, TTF_Font* font){
 
 	if (started == true) {
 		if (gameover == false) {
@@ -154,6 +157,13 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 			asteroid_surface = IMG_Load("./images/asteroid.bmp");
 			asteroid_texture = SDL_CreateTextureFromSurface(rend, asteroid_surface);
 			SDL_FreeSurface(asteroid_surface);
+
+			char str[100];
+			sprintf(str, "Score: %d", score);
+			SDL_Surface* text_surface = TTF_RenderText_Solid(font, str, white);
+			SDL_Texture* text_texture = SDL_CreateTextureFromSurface(rend, text_surface);
+			SDL_Rect render_quad = {100, 100, text_surface->w, text_surface->h};
+			SDL_FreeSurface(text_surface);
 			
 			SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
 			
@@ -162,6 +172,10 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 					SDL_RenderFillRect(rend, &bullet[i].rect);
 				}
 			}
+
+
+			SDL_FreeSurface(text_surface);
+			SDL_RenderCopy(rend, text_texture, NULL, &render_quad);
 			
 			
 			SDL_RenderCopy(rend, rocket_texture, NULL, &rocket.rect);
@@ -169,8 +183,10 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 			
 			SDL_RenderPresent(rend); 
 			SDL_RenderClear(rend);
+
 			SDL_DestroyTexture(asteroid_texture);
 			SDL_DestroyTexture(rocket_texture);
+			SDL_DestroyTexture(text_texture);
 			
 		}
 		else if (gameover) {
@@ -239,6 +255,7 @@ void update() {
 					bullet[i].onscreen = false;
 					summon_asteroid();
 					score += 1;
+					printf("%d\n", score);
 					break;
 				}
 			}
@@ -266,9 +283,7 @@ void update() {
 
 	if (gameover) {
 		setup();
-
 	}
-
 	}
 
 	
@@ -297,7 +312,7 @@ void setup() {
 		bullet[i].rect.w = 5;
 		bullet[i].rect.h= 10;
 		bullet[i].rect.y = -10;
-		bullet[i].vel = 700;
+		bullet[i].vel = 800;
 	}
 	summon_asteroid();
 
@@ -310,6 +325,7 @@ int main() {
 	SDL_Surface *start_surface;
 	SDL_Texture *start_texture;
 	SDL_Window *win = NULL;
+	TTF_Font* font = TTF_OpenFont("/usr/share/fonts/TTF/HackNerdFont-Regular.ttf", 24);
 	running = Init_Win(win);
 	
 	setup();
@@ -317,8 +333,8 @@ int main() {
 	while (running) {
 		input();
 		update();
-		render(rocket_surface, rocket_texture, asteroid_surface, asteroid_texture, start_surface, start_texture);
+		render(rocket_surface, rocket_texture, asteroid_surface, asteroid_texture, start_surface, start_texture, font);
 	}
-	destroy(win, rend, asteroid_texture, rocket_texture);
+	destroy(win, rend, asteroid_texture, rocket_texture, font);
 	return 0;
 }

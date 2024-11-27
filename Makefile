@@ -1,8 +1,14 @@
-build:
-	#gcc  src/main.c -ggdb -lSDL2 -lSDL2_image -o game
-	gcc -c src/main.c -ggdb -lSDL2 -lSDL2_image
-	gcc -c src/actions.c -lSDL2
-	gcc main.o actions.o -ggdb -lSDL2 -lSDL2_image -o game
+LIBS = -lSDL2 -lSDL2_image -lSDL2_ttf
+.PHONY: build clean
+build: build_objects build_main clean
+build_objects:
+	gcc -c src/main.c -ggdb $(LIBS)
+	gcc -c src/actions.c $(LIBS)
+.ONESHELL:
+.NOTPARALLEL: build_main clean
+build_main:
+	gcc main.o actions.o -ggdb $(LIBS) -o game
+clean:
 	rm *.o
 run:
 	make
