@@ -7,12 +7,14 @@ typedef struct Rocket {
 	int left;
 	int right;
 	bool added;
+	SDL_Texture* texture;
 } Rocket;
 
 typedef struct Asteroid {
 	SDL_Rect rect;
 	int vel;
 	bool added;
+	SDL_Texture* texture;
 } Asteroid;
 
 typedef struct Background {

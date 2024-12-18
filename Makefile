@@ -1,8 +1,8 @@
+LIBS = -lSDL2 -lSDL2_image 
 build:
-	#gcc  src/main.c -ggdb -lSDL2 -lSDL2_image -o game
-	gcc -c src/main.c -ggdb -lSDL2 -lSDL2_image
-	gcc -c src/actions.c -lSDL2
-	gcc main.o actions.o -ggdb -lSDL2 -lSDL2_image -o game
+	gcc -c src/main.c -O3 -ggdb -march=native $(LIBS)
+	gcc -c src/actions.c -O3 -march=native $(LIBS)
+	gcc main.o actions.o -O3 -march=native $(LIBS) -ggdb -o game
 	rm *.o
 run:
 	make

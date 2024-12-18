@@ -1,3 +1,4 @@
+#include <SDL2/SDL_render.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
@@ -9,7 +10,6 @@
 #include "sprites.h"
 
 //Globals
-SDL_Renderer *rend = NULL;
 
 int running = false;
 int last_frame_time;
@@ -31,15 +31,13 @@ void setup();
 
 
 
-int Init_Win(SDL_Window *win) {
-	//win = NULL;
-	//rend = NULL;
+int Init_Win(SDL_Window **win, SDL_Renderer** rend) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		fprintf(stderr, "Error initalizing SDL\n");
 		return false;
 	}
 
-	win = SDL_CreateWindow(
+	*win = SDL_CreateWindow(
 		"Asteriods",
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
@@ -53,7 +51,7 @@ int Init_Win(SDL_Window *win) {
 		return false;
 	}
 
-	rend = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	*rend = SDL_CreateRenderer(*win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (!rend) {
 		fprintf(stderr, "Error initalizing renderer\n");
 		printf("Error initalizing renderer\n");
@@ -135,7 +133,7 @@ void summon_asteroid() {
 
 
 
-void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surface *asteroid_surface, SDL_Texture *asteroid_texture, SDL_Surface* start_surface, SDL_Texture* start_texture) {
+void render(SDL_Renderer* rend, SDL_Surface* start_surface, SDL_Texture* start_texture) {
 
 	if (started == true) {
 		if (gameover == false) {
@@ -147,30 +145,23 @@ void render(SDL_Surface *rocket_surface, SDL_Texture *rocket_texture, SDL_Surfac
 			SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
 			SDL_RenderClear(rend);
 			
-			rocket_surface = IMG_Load("./images/rocket.bmp");
-			rocket_texture = SDL_CreateTextureFromSurface(rend, rocket_surface);
-			SDL_FreeSurface(rocket_surface);
 
-			asteroid_surface = IMG_Load("./images/asteroid.bmp");
-			asteroid_texture = SDL_CreateTextureFromSurface(rend, asteroid_surface);
-			SDL_FreeSurface(asteroid_surface);
+
 			
 			SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
 			
-			for (int i = 0; i <= MAX_BULLETS; i++) {
+			for (int i = 0; i < MAX_BULLETS; i++) {
 				if (bullet[i].onscreen) {
 					SDL_RenderFillRect(rend, &bullet[i].rect);
 				}
 			}
 			
 			
-			SDL_RenderCopy(rend, rocket_texture, NULL, &rocket.rect);
-			SDL_RenderCopy(rend, asteroid_texture, NULL, &asteroid.rect);
+			SDL_RenderCopy(rend, rocket.texture, NULL, &rocket.rect);
+			SDL_RenderCopy(rend, asteroid.texture, NULL, &asteroid.rect);
 			
 			SDL_RenderPresent(rend); 
 			SDL_RenderClear(rend);
-			SDL_DestroyTexture(asteroid_texture);
-			SDL_DestroyTexture(rocket_texture);
 			
 		}
 		else if (gameover) {
@@ -228,7 +219,7 @@ void update() {
 				}
 				
 			}
-			for (int i = 0; i <= MAX_BULLETS; i++) {
+			for (int i = 0; i < MAX_BULLETS; i++) {
 				if (bullet[i].onscreen) {
 					bullet[i].rect.y -= bullet[i].vel * dtime;
 				}
@@ -275,7 +266,7 @@ void update() {
 }
 
 
-void setup() {
+void setup(SDL_Renderer* rend) {
 	rocket.rect.x = (WIN_WIDTH / 2) - 20;
 	rocket.rect.y = 620;
 	rocket.rect.w = 46;
@@ -293,32 +284,48 @@ void setup() {
 	rocket.left = 0;
 	rocket.added = false;
 	asteroid.added = false;
-	for (int i = 0; i <= MAX_BULLETS; i++) {
+	
+	//rocket
+	SDL_Surface* surface = IMG_Load("./images/rocket.bmp");
+	rocket.texture = SDL_CreateTextureFromSurface(rend, surface);
+	SDL_FreeSurface(surface);
+	SDL_QueryTexture(rocket.texture, NULL, NULL, &rocket.rect.w, &rocket.rect.h);
+	rocket.rect.w /= 20;
+	rocket.rect.h /= 20;
+	
+	//asteroid
+	surface = IMG_Load("./images/asteroid.bmp");
+	asteroid.texture = SDL_CreateTextureFromSurface(rend, surface);
+	SDL_FreeSurface(surface);
+	SDL_QueryTexture(asteroid.texture, NULL, NULL, &asteroid.rect.w, &asteroid.rect.h);
+	asteroid.rect.w /= 12;
+	asteroid.rect.h /= 12;
+
+
+
+	for (int i = 0; i < MAX_BULLETS; i++) {
 		bullet[i].rect.w = 5;
 		bullet[i].rect.h= 10;
 		bullet[i].rect.y = -10;
-		bullet[i].vel = 700;
+		bullet[i].vel = 800;
 	}
 	summon_asteroid();
 
 }
 int main() {
-	SDL_Surface *rocket_surface;
-	SDL_Texture *rocket_texture;
-	SDL_Surface *asteroid_surface;
-	SDL_Texture *asteroid_texture;
 	SDL_Surface *start_surface;
 	SDL_Texture *start_texture;
 	SDL_Window *win = NULL;
-	running = Init_Win(win);
+	SDL_Renderer *rend = NULL;
+	running = Init_Win(&win, &rend);
 	
-	setup();
+	setup(rend);
 
 	while (running) {
 		input();
 		update();
-		render(rocket_surface, rocket_texture, asteroid_surface, asteroid_texture, start_surface, start_texture);
+		render(rend, start_surface, start_texture);
 	}
-	destroy(win, rend, asteroid_texture, rocket_texture);
+	destroy(win, rend, asteroid.texture, rocket.texture);
 	return 0;
 }
