@@ -215,7 +215,7 @@ void update(SDL_Renderer* rend) {
 			}
 
 			if (rocket.added == false && score != 0 && score % 10 == 0) {
-				rocket.vel += 10;
+				rocket.vel += 15;
 				rocket.added = true;
 			}
 
@@ -235,23 +235,11 @@ void update(SDL_Renderer* rend) {
 
 
 void setup(SDL_Renderer* rend) {
-	rocket.rect.x = (WIN_WIDTH / 2) - 20;
-	rocket.rect.y = 620;
-	rocket.rect.w = 46;
-	rocket.rect.h = 82;
-	asteroid.rect.w= 50;
-	asteroid.rect.h= 50;
 	background.rect.x = 0;
 	background.rect.y = 0;
 	background.rect.w= WIN_WIDTH;
 	background.rect.h= WIN_HEIGHT;
-	asteroid.vel = 130;
-	rocket.vel = 420;
 	score = 0;
-	rocket.right = 0;
-	rocket.left = 0;
-	rocket.added = false;
-	asteroid.added = false;
 	
 	//rocket
 	SDL_Surface* surface = IMG_Load("./images/rocket.bmp");
@@ -260,6 +248,12 @@ void setup(SDL_Renderer* rend) {
 	SDL_QueryTexture(rocket.texture, NULL, NULL, &rocket.rect.w, &rocket.rect.h);
 	rocket.rect.w /= 20;
 	rocket.rect.h /= 20;
+	rocket.rect.x = (WIN_WIDTH / 2) - 20;
+	rocket.rect.y = 620;
+	rocket.right = 0;
+	rocket.left = 0;
+	rocket.vel = 420;
+	rocket.added = false;
 	
 	//asteroid
 	surface = IMG_Load("./images/asteroid.bmp");
@@ -268,6 +262,8 @@ void setup(SDL_Renderer* rend) {
 	SDL_QueryTexture(asteroid.texture, NULL, NULL, &asteroid.rect.w, &asteroid.rect.h);
 	asteroid.rect.w /= 12;
 	asteroid.rect.h /= 12;
+	asteroid.vel = 130;
+	asteroid.added = false;
 
 
 
