@@ -16,7 +16,10 @@ jobs:
 
     - name: install deps
       run:  |
-        choco install Make gcc sdl2 sdl2-image -y
+        choco install Make -y
+        choco install gcc -y
+        choco install sdl2 -y
+        choco install sdl2-image -y
     - name: make
       run: make
     - name: make pkg-windows
