@@ -17,7 +17,7 @@ jobs:
     - name: install deps
       run:  |
         choco install Make -y
-        choco install gcc -y
+        choco install mingw -y
         choco install sdl2 -y
         choco install sdl2-image -y
     - name: make
