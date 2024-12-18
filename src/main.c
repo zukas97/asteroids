@@ -27,43 +27,11 @@ Bullet bullet[MAX_BULLETS];
 
 SDL_Color white = {255, 255, 255};
 
-void setup();
+void setup(SDL_Renderer* rend);
 
 
 
-int Init_Win(SDL_Window **win, SDL_Renderer** rend) {
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-		fprintf(stderr, "Error initalizing SDL\n");
-		return false;
-	}
 
-	*win = SDL_CreateWindow(
-		"Asteriods",
-		SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED,
-		WIN_WIDTH,
-		WIN_HEIGHT,
-		0
-			);
-
-	if (!win) {
-		fprintf(stderr, "Error initalizing window\n");
-		return false;
-	}
-
-	*rend = SDL_CreateRenderer(*win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (!rend) {
-		fprintf(stderr, "Error initalizing renderer\n");
-		printf("Error initalizing renderer\n");
-		return false;
-	}
-
-	if (!IMG_Init(IMG_INIT_PNG)) {
-		fprintf(stderr, "Error initalizing SDL_image\n");
-		return false;
-	}
-	return true;
-}
 
 void input() {
 		SDL_Event event;
@@ -187,7 +155,7 @@ void render(SDL_Renderer* rend, SDL_Surface* start_surface, SDL_Texture* start_t
 	}
 }
 
-void update() {
+void update(SDL_Renderer* rend) {
 	int wait_time = FRAME_TIME - (SDL_GetTicks() - last_frame_time);
 
 	if (wait_time > 0 && wait_time <= FRAME_TIME) {
@@ -256,7 +224,7 @@ void update() {
 	}
 
 	if (gameover) {
-		setup();
+		setup(rend);
 
 	}
 
@@ -323,7 +291,7 @@ int main() {
 
 	while (running) {
 		input();
-		update();
+		update(rend);
 		render(rend, start_surface, start_texture);
 	}
 	destroy(win, rend, asteroid.texture, rocket.texture);

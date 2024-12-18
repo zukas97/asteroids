@@ -9,4 +9,5 @@
 #include "sprites.h"
 
 void destroy(SDL_Window *win, SDL_Renderer *rend, SDL_Texture *asteroid_texture, SDL_Texture *rocket_texture);
+int Init_Win(SDL_Window** win, SDL_Renderer** rend);
 #endif
