@@ -7,7 +7,7 @@ void destroy(SDL_Window *win, SDL_Renderer *rend, SDL_Texture *asteroid_texture,
 	SDL_DestroyWindow(win);
 	SDL_Quit();
 }
-int Init_Win(SDL_Window **win, SDL_Renderer** rend) {
+int Init_Win(SDL_Window **win, SDL_Renderer** rend, TTF_Font** font) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		fprintf(stderr, "Error initalizing SDL\n");
 		return false;
@@ -38,5 +38,17 @@ int Init_Win(SDL_Window **win, SDL_Renderer** rend) {
 		fprintf(stderr, "Error initalizing SDL_image\n");
 		return false;
 	}
+	if (TTF_Init() != 0) {
+		perror("unable to init TTF");
+		return false;
+	}
+
+	*font = TTF_OpenFont("/usr/share/fonts/TTF/DejaVuSansMono.ttf", 15);
+
+	if (!*font) {
+		perror("font is NULL");
+		return false;
+	}
+
 	return true;
 }

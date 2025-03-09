@@ -1,10 +1,10 @@
-LIBS = -lSDL2 -lSDL2_image 
+LIBS = -lSDL2 -lSDL2_image -lSDL2_ttf -ggdb
 CFLAGS = -O2 -pipe
 WINCLUDE = -I/usr/x86_64-w64-mingw32/include hello.c -L/usr/x86_64-w64-mingw32/lib
 build:
 	gcc -c src/main.c -ggdb $(CFLAGS) $(LIBS)
 	gcc -c src/actions.c $(CFLAGS) $(LIBS)
-	gcc main.o actions.o $(CFLAGS) $(LIBS) -ggdb -o game
+	gcc main.o actions.o $(CFLAGS) $(LIBS) -o game
 	rm *.o
 run:
 	make

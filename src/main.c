@@ -29,10 +29,6 @@ SDL_Color white = {255, 255, 255};
 
 void setup(SDL_Renderer* rend);
 
-
-
-
-
 void input() {
 		SDL_Event event;
 		if (SDL_PollEvent(&event)){
@@ -99,12 +95,10 @@ void summon_asteroid() {
 	asteroid.rect.y = ASTEROID_START;
 }
 
+void render(SDL_Renderer* rend, SDL_Surface* start_surface, SDL_Texture* start_texture, TTF_Font* font, SDL_Texture* font_texture, char* text) {
 
-
-void render(SDL_Renderer* rend, SDL_Surface* start_surface, SDL_Texture* start_texture) {
-
-	if (started == true) {
-		if (gameover == false) {
+	if (started) {
+		if (!gameover) {
 		
 			if (SDL_HasIntersection(&rocket.rect, &asteroid.rect)) {
 				gameover = true;
@@ -113,9 +107,6 @@ void render(SDL_Renderer* rend, SDL_Surface* start_surface, SDL_Texture* start_t
 			SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
 			SDL_RenderClear(rend);
 			
-
-
-			
 			SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
 			
 			for (int i = 0; i < MAX_BULLETS; i++) {
@@ -123,13 +114,26 @@ void render(SDL_Renderer* rend, SDL_Surface* start_surface, SDL_Texture* start_t
 					SDL_RenderFillRect(rend, &bullet[i].rect);
 				}
 			}
+
+			sprintf(text, "Score: %d", score);
 			
+			SDL_Rect font_rect;
+			SDL_Surface* font_surface =  TTF_RenderText_Solid(font, text, white);
+			font_texture = SDL_CreateTextureFromSurface(rend, font_surface);
+			SDL_FreeSurface(font_surface);
+			SDL_QueryTexture(font_texture, NULL, NULL, &font_rect.w, &font_rect.h);
+			font_rect.x = 10;
+			font_rect.y = 10;
+
 			
+			SDL_RenderCopy(rend, font_texture, NULL, &font_rect);
 			SDL_RenderCopy(rend, rocket.texture, NULL, &rocket.rect);
 			SDL_RenderCopy(rend, asteroid.texture, NULL, &asteroid.rect);
 			
 			SDL_RenderPresent(rend); 
 			SDL_RenderClear(rend);
+
+			//SDL_DestroyTexture(font_texture);
 			
 		}
 		else if (gameover) {
@@ -140,7 +144,6 @@ void render(SDL_Renderer* rend, SDL_Surface* start_surface, SDL_Texture* start_t
 			SDL_RenderCopy(rend, background_texture, NULL, &background.rect);
 			SDL_RenderPresent(rend);
 			SDL_DestroyTexture(background_texture);
-
 
 		}
 	}
@@ -265,8 +268,7 @@ void setup(SDL_Renderer* rend) {
 	asteroid.vel = 130;
 	asteroid.added = false;
 
-
-
+	// bullet
 	for (int i = 0; i < MAX_BULLETS; i++) {
 		bullet[i].rect.w = 5;
 		bullet[i].rect.h= 10;
@@ -281,14 +283,17 @@ int main() {
 	SDL_Texture *start_texture;
 	SDL_Window *win = NULL;
 	SDL_Renderer *rend = NULL;
-	running = Init_Win(&win, &rend);
+	SDL_Texture* font_texture;
+	TTF_Font* font;
+	char text[11];
+	running = Init_Win(&win, &rend, &font);
 	
 	setup(rend);
 
 	while (running) {
 		input();
 		update(rend);
-		render(rend, start_surface, start_texture);
+		render(rend, start_surface, start_texture, font, font_texture, text);
 	}
 	destroy(win, rend, asteroid.texture, rocket.texture);
 	return 0;
