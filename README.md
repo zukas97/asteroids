@@ -26,3 +26,5 @@ I have not yet made a package for any distro as this is still in development but
 `SDL2`
 
 `SDL2_image`
+
+`SDL2_ttf`

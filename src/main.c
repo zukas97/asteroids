@@ -10,13 +10,11 @@
 #include "sprites.h"
 
 //Globals
-
 int running = false;
 int last_frame_time;
 float dtime;
 bool gameover = false;
 bool started = false;
-
 int score;
 
 Asteroid asteroid;
@@ -47,42 +45,44 @@ void input() {
 
 
 				case SDL_KEYDOWN:
-					switch (event.key.keysym.sym) {
-						case SDLK_ESCAPE:
-							running = false;
-							break;
+					if (event.key.repeat == 0) {
+						switch (event.key.keysym.sym) {
+							case SDLK_ESCAPE:
+								running = false;
+								break;
+							
+							case SDLK_LEFT:
+								rocket.left = 1;
+								rocket.right = 0;
+								break;
+							case SDLK_RIGHT:
+								rocket.right = 1;
+								rocket.left = 0;
+								break;
+							case SDLK_SPACE:
+								for (int i=0; i <= MAX_BULLETS; i++) {
+									if (!bullet[i].onscreen) {
+										bullet[i].rect.x = rocket.rect.x + (rocket.rect.w/2);
+										bullet[i].rect.y = rocket.rect.y;
+										bullet[i].onscreen = true;
+										break;
+									}
+								}
+							case SDLK_RETURN:
+								if (event.key.keysym.sym != SDLK_SPACE) {
+									if (!started) {
+										started = true;
+									}
+									else if (gameover) {
+										gameover = false;
+									}
+								}
+						break;		break;
+												
+
+
 						
-						case SDLK_LEFT:
-							rocket.left = 1;
-							rocket.right = 0;
-							break;
-						case SDLK_RIGHT:
-							rocket.right = 1;
-							rocket.left = 0;
-							break;
-						case SDLK_SPACE:
-							for (int i=0; i <= MAX_BULLETS; i++) {
-								if (!bullet[i].onscreen) {
-									bullet[i].rect.x = rocket.rect.x + (rocket.rect.w/2);
-									bullet[i].rect.y = rocket.rect.y;
-									bullet[i].onscreen = true;
-									break;
-								}
-							}
-						case SDLK_RETURN:
-							if (event.key.keysym.sym != SDLK_SPACE) {
-								if (!started) {
-									started = true;
-								}
-								else if (gameover) {
-									gameover = false;
-								}
-							}
-					break;		break;
-											
-
-
-					
+						}
 					}
 			}
 		}
@@ -124,6 +124,9 @@ void render(SDL_Renderer* rend, SDL_Surface* start_surface, SDL_Texture* start_t
 			SDL_QueryTexture(font_texture, NULL, NULL, &font_rect.w, &font_rect.h);
 			font_rect.x = 10;
 			font_rect.y = 10;
+
+			//SDL_SetTextureColorMod(rocket.texture, 0, 50, 0);
+			//SDL_SetTextureAlphaMod(rocket.texture, 100);
 
 			
 			SDL_RenderCopy(rend, font_texture, NULL, &font_rect);
@@ -227,6 +230,8 @@ void update(SDL_Renderer* rend) {
 	}
 
 	if (gameover) {
+		SDL_DestroyTexture(rocket.texture);
+		SDL_DestroyTexture(asteroid.texture);
 		setup(rend);
 
 	}
@@ -235,7 +240,6 @@ void update(SDL_Renderer* rend) {
 
 	
 }
-
 
 void setup(SDL_Renderer* rend) {
 	background.rect.x = 0;
@@ -273,7 +277,7 @@ void setup(SDL_Renderer* rend) {
 		bullet[i].rect.w = 5;
 		bullet[i].rect.h= 10;
 		bullet[i].rect.y = -10;
-		bullet[i].vel = 800;
+		bullet[i].vel = BULLET_SPEED;
 	}
 	summon_asteroid();
 
